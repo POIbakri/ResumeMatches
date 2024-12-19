@@ -19,9 +19,10 @@ class DemoStorage {
     }];
 
     this.jobs = [{
+      company: 'Acme Corp',
       id: 'job-1',
       title: 'Senior Full Stack Developer',
-      description: 'Looking for a senior developer with strong React experience',
+      jd_text: 'Looking for a senior developer with strong React experience',
       created_at: new Date().toISOString()
     }];
 

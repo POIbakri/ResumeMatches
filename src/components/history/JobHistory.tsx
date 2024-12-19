@@ -15,7 +15,7 @@ export function JobHistory() {
         <div key={job.id} className="bg-white p-4 rounded-lg border border-gray-200">
           <h3 className="font-medium text-gray-900">{job.title}</h3>
           <p className="text-sm text-gray-500 mt-1">{formatDate(job.created_at)}</p>
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2">{job.description}</p>
+          <p className="text-sm text-gray-600 mt-2 line-clamp-2">{job.jd_text}</p>
         </div>
       ))}
       {!jobs.length && (

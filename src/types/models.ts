@@ -19,7 +19,7 @@ export interface InterviewQuestion {
 }
 
 export interface Analysis {
-  id: string;
+  id?: string; // Make optional since it may not exist on creation
   candidate_id: string;
   job_id: string;
   fit_score: number;
@@ -35,9 +35,9 @@ export interface Analysis {
   status: 'pending' | 'interviewed' | 'hired' | 'rejected';
   interview_date?: string;
   interviewer_feedback?: string;
-  technical_skills?: TechnicalSkill[];
-  risk_factors?: string[];
-  growth_potential?: {
+  technical_skills: TechnicalSkill[]; // Make required since API expects it
+  risk_factors: string[]; // Make required since API expects it
+  growth_potential: { // Make required since API expects it
     areas: string[];
     recommendations: string[];
   };
@@ -58,6 +58,7 @@ export interface Candidate {
 export interface Job {
   id: string;
   title: string;
-  description: string;
+  jd_text: string;
+  company: string;
   created_at: string;
 }

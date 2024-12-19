@@ -42,13 +42,13 @@ export function JobSelector({ onSelect }: JobSelectorProps) {
               <button
                 key={job.id}
                 onClick={() => {
-                  onSelect({ title: job.title, description: job.description });
+                  onSelect({ title: job.title, description: job.jd_text });
                   setIsOpen(false);
                 }}
                 className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
               >
                 <p className="font-medium text-gray-900">{job.title}</p>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{job.description}</p>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{job.jd_text}</p>
               </button>
             ))}
           </div>

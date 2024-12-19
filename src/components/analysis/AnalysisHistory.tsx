@@ -50,7 +50,7 @@ export function AnalysisHistory() {
         <AnalysisCard
           key={analysis.id}
           analysis={analysis}
-          onClick={() => setSelectedAnalysis(analysis.id)}
+          onClick={() => setSelectedAnalysis(analysis.id ?? null)}
         />
       ))}
     </div>

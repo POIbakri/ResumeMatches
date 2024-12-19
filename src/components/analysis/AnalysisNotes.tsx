@@ -10,12 +10,17 @@ interface AnalysisNotesProps {
 
 export function AnalysisNotes({ analysis }: AnalysisNotesProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const { updateNotes, isLoading } = useAnalysisNotes(analysis.id);
+  const { updateNotes, isLoading } = useAnalysisNotes(analysis.id ?? ''); // Handle potential undefined id
   const [notes, setNotes] = useState(analysis.notes || '');
 
   const handleSave = async () => {
-    await updateNotes(notes);
-    setIsEditing(false);
+    try {
+      await updateNotes(notes);
+      setIsEditing(false);
+    } catch (error) {
+      // Error is already handled in useAnalysisNotes hook
+      setIsEditing(true); // Keep editing mode on error
+    }
   };
 
   return (
@@ -44,6 +49,7 @@ export function AnalysisNotes({ analysis }: AnalysisNotesProps) {
             <Button
               variant="secondary"
               onClick={() => setIsEditing(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>

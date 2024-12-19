@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAnalysisDetails } from './hooks/useAnalysisDetails';
 import { AnalysisResults } from './AnalysisResults';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';

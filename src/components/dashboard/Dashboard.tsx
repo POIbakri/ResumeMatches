@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UploadForm } from '../upload/UploadForm';
 import { AnalysisHistory } from '../analysis/AnalysisHistory';
+import { CandidateHistory } from '../history/CandidateHistory';
+import { JobHistory } from '../history/JobHistory';
 import { Tabs } from '../layout/Tabs';
 import { DashboardStats } from './DashboardStats';
 import { DashboardHeader } from './DashboardHeader';
 import { RecentActivity } from './RecentActivity';
-import { QuickActions } from './QuickActions';
 import { useAuth } from '../../hooks/useAuth';
 
 const tabs = [
   { id: 'new', label: 'New Analysis' },
-  { id: 'history', label: 'Analysis History' }
+  { id: 'history', label: 'Analysis History' },
+  { id: 'candidates', label: 'Previous Candidates' },
+  { id: 'jobs', label: 'Previous Jobs' }
 ];
 
 export function Dashboard() {
@@ -30,8 +33,6 @@ export function Dashboard() {
         </div>
       </div>
 
-      <QuickActions />
-
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
           <Tabs
@@ -43,6 +44,8 @@ export function Dashboard() {
           <div className="mt-6">
             {activeTab === 'new' && <UploadForm />}
             {activeTab === 'history' && <AnalysisHistory />}
+            {activeTab === 'candidates' && <CandidateHistory />}
+            {activeTab === 'jobs' && <JobHistory />}
           </div>
         </div>
       </div>

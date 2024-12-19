@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSubscription } from '../../hooks/pricing/useSubscription';
 import { getUsageStats } from '../../services/pricing/usage';
 

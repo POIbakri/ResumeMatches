@@ -1,4 +1,3 @@
-import React from 'react';
 import { DocumentIcon, BriefcaseIcon } from '@heroicons/react/24/outline';
 import type { Analysis } from '../../types/models';
 

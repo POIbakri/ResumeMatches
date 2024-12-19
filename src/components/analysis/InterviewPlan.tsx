@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 interface InterviewSection {
   title: string;
   duration: string;
   questions: string[];
-  redFlags?: string[];
-  greenFlags?: string[];
+  redFlags: string[]; // Made required by removing optional
+  greenFlags: string[]; // Made required by removing optional
 }
 
 interface InterviewPlanProps {
@@ -33,11 +33,11 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
 
         const redFlags = lines
           .filter(line => line.toLowerCase().includes('red flag'))
-          .map(line => line.replace(/^[^:]*:\s*/, ''));
+          .map(line => line.replace(/^[^:]*:\s*/, '')) || []; // Default to empty array
         
         const greenFlags = lines
           .filter(line => line.toLowerCase().includes('green flag'))
-          .map(line => line.replace(/^[^:]*:\s*/, ''));
+          .map(line => line.replace(/^[^:]*:\s*/, '')) || []; // Default to empty array
 
         return {
           title: title.trim(),
@@ -85,7 +85,7 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
                 </ul>
               </div>
 
-              {section.redFlags && section.redFlags.length > 0 && (
+              {section.redFlags.length > 0 && (
                 <div>
                   <h5 className="font-medium text-red-600 mb-2">Watch out for:</h5>
                   <ul className="space-y-2">
@@ -99,7 +99,7 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
                 </div>
               )}
 
-              {section.greenFlags && section.greenFlags.length > 0 && (
+              {section.greenFlags.length > 0 && (
                 <div>
                   <h5 className="font-medium text-green-600 mb-2">Positive Indicators:</h5>
                   <ul className="space-y-2">

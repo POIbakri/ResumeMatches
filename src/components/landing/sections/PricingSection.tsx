@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { PRICING_PLANS } from '../../../config/pricing/plans';

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useInterviewQuestions } from './hooks/useInterviewQuestions';
-import { Button } from '../form/Button';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import type { InterviewQuestion } from '../../types/models';
 

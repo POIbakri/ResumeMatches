@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { exportAnalysisToPDF } from '../../utils/pdfExport';
 import type { Analysis } from '../../types/models';

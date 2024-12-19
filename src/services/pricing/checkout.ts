@@ -10,7 +10,7 @@ if (!stripePublicKey && !STRIPE_CONFIG.MOCK_MODE) {
 
 export const stripe = loadStripe(stripePublicKey || 'pk_test_mock');
 
-export async function createCheckoutSession(userId: string, planId: PlanId) {
+export async function createCheckoutSession(_userId: string, _planId: PlanId) {
   if (STRIPE_CONFIG.MOCK_MODE) {
     return {
       id: `mock_session_${Date.now()}`,

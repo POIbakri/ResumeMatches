@@ -47,3 +47,17 @@ export interface AnalysisHistory extends Analysis {
   candidate_name: string;
   job_title: string;
 }
+
+export interface Candidate {
+  id: string;
+  name: string;
+  cv_text: string;
+  created_at: string;
+}
+
+export interface Job {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+}

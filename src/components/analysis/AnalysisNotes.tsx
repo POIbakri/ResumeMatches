@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAnalysisNotes } from './hooks/useAnalysisNotes';
 import { Button } from '../form/Button';
 import { TextArea } from '../form/TextArea';

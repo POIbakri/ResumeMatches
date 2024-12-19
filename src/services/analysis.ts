@@ -2,6 +2,7 @@ import { analyzeWithGPT4 } from '../lib/openai/client';
 import { parseAnalysisResponse } from '../lib/openai/parser';
 import { ApiError } from '../lib/errors';
 import type { Analysis } from '../types/models';
+import { supabase } from '../lib/supabase';
 
 export async function analyzeCandidateJob(
   candidateId: string,
@@ -20,7 +21,7 @@ export async function analyzeCandidateJob(
     // Analyze using GPT-4
     const analysisResponse = await analyzeWithGPT4(
       candidateResult.data.cv_text,
-      jobResult.data.jd_text
+      jobResult.data.description
     );
 
     // Parse the response

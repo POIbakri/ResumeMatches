@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { formatDuration } from '../../lib/utils';
+//import { formatDate } from '../../lib/utils';
 
 interface InterviewSection {
   title: string;
@@ -111,7 +111,7 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
                   )}
 
                   <div className="ml-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {question.redFlags.length > 0 && (
+                    {question.redFlags && question.redFlags.length > 0 && (
                       <div className="bg-red-50 p-3 rounded-md">
                         <p className="text-sm font-medium text-red-800 mb-2">Watch out for:</p>
                         <ul className="space-y-1">
@@ -125,7 +125,7 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
                       </div>
                     )}
 
-                    {question.greenFlags.length > 0 && (
+                    {question.greenFlags && question.greenFlags.length > 0 && (
                       <div className="bg-green-50 p-3 rounded-md">
                         <p className="text-sm font-medium text-green-800 mb-2">Positive Indicators:</p>
                         <ul className="space-y-1">

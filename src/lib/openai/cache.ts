@@ -23,7 +23,7 @@ export async function getCachedAnalysis(prompt: AnalysisPrompt): Promise<ParsedA
 
   const { data, error } = await supabase
     .from('analysis_cache')
-    .select('*')
+    .select<'*', CacheEntry>('*')
     .eq('prompt_hash', promptHash)
     .gt('expires_at', now)
     .single();
@@ -37,9 +37,15 @@ export async function cacheAnalysis(prompt: AnalysisPrompt, response: ParsedAnal
   const now = new Date();
   const expiresAt = new Date(now.getTime() + CACHE_TTL);
 
-  const { error } = await supabase
+  const supabaseClient = createClient(
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_ANON_KEY || ''
+  );
+
+  const { error } = await supabaseClient
     .from('analysis_cache')
-    .insert([{
+    .insert<CacheEntry>([{
+      id: crypto.randomUUID(),
       prompt_hash: promptHash,
       response,
       created_at: now.toISOString(),

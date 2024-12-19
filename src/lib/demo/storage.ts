@@ -21,7 +21,7 @@ class DemoStorage {
     this.jobs = [{
       id: 'job-1',
       title: 'Senior Full Stack Developer',
-      jd_text: 'Looking for a senior developer with strong React experience',
+      description: 'Looking for a senior developer with strong React experience',
       created_at: new Date().toISOString()
     }];
 

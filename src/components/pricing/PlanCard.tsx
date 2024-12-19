@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlanFeatures } from './PlanFeatures';
 import { SubscriptionButton } from './SubscriptionButton';
 import type { PricingPlan } from '../../config/pricing/types';

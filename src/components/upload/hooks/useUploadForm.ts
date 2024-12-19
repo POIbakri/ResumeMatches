@@ -25,7 +25,14 @@ export function useUploadForm() {
   const form = useForm<UploadFormValues>({
     initialValues,
     validationSchema: uploadFormSchema,
-    onSubmit: analyze,
+    onSubmit: async (values) => {
+      await analyze({
+        candidateName: values.candidateName,
+        cvText: values.cvText,
+        jobTitle: values.jobTitle,
+        jobDescription: values.jobDescription
+      });
+    },
   });
 
   return {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
-import { updateAnalysisNotes } from '../../../services/analysis';
+import { updateAnalysisNotes } from '../../../services/analysis/queries';
 
 export function useAnalysisNotes(analysisId: string) {
   const [isLoading, setIsLoading] = useState(false);

@@ -2,7 +2,7 @@ import { SubscriptionStatus } from '../../config/pricing/types';
 import { ANALYSIS_LIMITS, USAGE_THRESHOLDS } from '../../config/pricing/limits';
 
 export function getUsageStats(subscription: SubscriptionStatus) {
-  const limit = ANALYSIS_LIMITS[subscription.plan.toUpperCase()];
+  const limit = ANALYSIS_LIMITS[subscription.plan.toUpperCase() as keyof typeof ANALYSIS_LIMITS];
   const used = subscription.analysisCount;
   const remaining = Math.max(0, limit - used);
   const usagePercentage = (used / limit) * 100;
@@ -19,5 +19,5 @@ export function getUsageStats(subscription: SubscriptionStatus) {
 
 export function canPerformAnalysis(subscription: SubscriptionStatus): boolean {
   if (subscription.status !== 'active') return false;
-  return subscription.analysisCount < ANALYSIS_LIMITS[subscription.plan.toUpperCase()];
+  return subscription.analysisCount < ANALYSIS_LIMITS[subscription.plan.toUpperCase() as keyof typeof ANALYSIS_LIMITS];
 }

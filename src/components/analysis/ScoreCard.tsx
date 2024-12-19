@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Verdict } from '../../types/models';
 
 interface ScoreCardProps {

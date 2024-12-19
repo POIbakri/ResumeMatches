@@ -1,3 +1,6 @@
+import { ENV } from "../config";
+import { analytics } from "./analytics";
+
 // Performance monitoring
 export function measurePerformance<T>(
   operation: () => Promise<T>,

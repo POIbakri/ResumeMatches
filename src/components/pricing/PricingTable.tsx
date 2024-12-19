@@ -1,4 +1,3 @@
-import React from 'react';
 import { PRICING_PLANS } from '../../config/pricing/plans';
 import { PlanCard } from './PlanCard';
 

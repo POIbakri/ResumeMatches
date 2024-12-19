@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Analysis } from '../../types/models';
 
 interface Props {

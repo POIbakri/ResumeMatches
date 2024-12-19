@@ -57,6 +57,7 @@ export function parseAnalysisResponse(content: string): Omit<Analysis, 'id' | 'c
     cv_summary: '',
     job_requirements: '',
     questions_used: [],
+    suggestions: [], // Added missing required field
     status: 'pending'
   };
 }

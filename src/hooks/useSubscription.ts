@@ -1,51 +1,67 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from './useAuth';
-import { getSubscriptionStatus } from '../services/stripe';
-import { STRIPE_CONFIG } from '../config/stripe';
-import type { Subscription, SubscriptionHook } from '../types/subscription';
+import { useAuth } from './auth/useAuth';
+import { getSubscriptionStatus, getRemainingAnalyses, canPerformAnalysis } from '../services/pricing/subscription';
+import type { SubscriptionStatus } from '../config/pricing/types';
 
-export function useSubscription(): SubscriptionHook {
+export function useSubscription() {
   const { session } = useAuth();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchSubscription() {
       if (!session?.user) {
-        setSubscription(null);
-        setLoading(false);
+        if (isMounted) {
+          setSubscription(null);
+          setLoading(false);
+        }
         return;
       }
 
       try {
+        // Add delay to prevent rapid refetching
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const status = await getSubscriptionStatus(session.user.id);
-        setSubscription(status);
-      } catch (error) {
-        console.error('Error fetching subscription:', error);
+        
+        if (isMounted) {
+          setSubscription(status);
+          setError(null);
+        }
+      } catch (err) {
+        console.error('Subscription fetch error:', err);
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error('Failed to fetch subscription'));
+          // Set default subscription state on error
+          setSubscription({
+            status: 'active',
+            plan: 'free',
+            analysisCount: 0,
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          });
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchSubscription();
+
+    return () => {
+      isMounted = false;
+    };
   }, [session]);
-
-  const canAnalyze = (): boolean => {
-    if (!subscription) return false;
-    if (subscription.plan === 'pro') return true;
-    return subscription.analysisCount < STRIPE_CONFIG.MAX_FREE_ANALYSES;
-  };
-
-  const remainingAnalyses = (): number => {
-    if (!subscription) return 0;
-    if (subscription.plan === 'pro') return Infinity;
-    return Math.max(0, STRIPE_CONFIG.MAX_FREE_ANALYSES - subscription.analysisCount);
-  };
 
   return {
     subscription,
     loading,
-    canAnalyze,
-    remainingAnalyses
+    error,
+    canAnalyze: subscription ? canPerformAnalysis(subscription) : false,
+    remainingAnalyses: subscription ? getRemainingAnalyses(subscription) : 0
   };
 }

@@ -37,7 +37,9 @@ export function useForm<T extends Record<string, any>>({
       if (!validationSchema) return '';
 
       try {
-        validationSchema.shape[field as string].parse(value);
+        // Create a partial schema with just the field being validated
+        const partialSchema = z.object({ [field]: (validationSchema as any)._def.shape[field] });
+        partialSchema.parse({ [field]: value });
         return '';
       } catch (error) {
         if (error instanceof z.ZodError) {

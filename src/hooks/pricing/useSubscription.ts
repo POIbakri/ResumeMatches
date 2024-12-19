@@ -7,6 +7,7 @@ export function useSubscription() {
   const { session } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -17,10 +18,20 @@ export function useSubscription() {
       }
 
       try {
-        const status = await getSubscriptionStatus(session.user.id);
-        setSubscription(status);
-      } catch (error) {
-        console.error('Error fetching subscription:', error);
+        const response = await getSubscriptionStatus(session.user.id);
+        
+        // Validate response is proper JSON before setting
+        if (typeof response === 'object' && response !== null) {
+          setSubscription(response);
+          setError(null);
+        } else {
+          throw new Error('Invalid subscription response format');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch subscription';
+        setError(new Error(errorMessage));
+        console.error('Error fetching subscription:', err);
+        setSubscription(null);
       } finally {
         setLoading(false);
       }
@@ -32,6 +43,7 @@ export function useSubscription() {
   return {
     subscription,
     loading,
+    error,
     canAnalyze: subscription ? canPerformAnalysis(subscription) : false,
     remainingAnalyses: subscription ? getRemainingAnalyses(subscription) : 0
   };

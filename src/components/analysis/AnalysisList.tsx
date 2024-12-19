@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAnalysisHistory } from './hooks/useAnalysisHistory';
 import { AnalysisCard } from './AnalysisCard';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';

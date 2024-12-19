@@ -1,4 +1,3 @@
-import React from 'react';
 import { CandidateForm } from './CandidateForm';
 import { JobForm } from './JobForm';
 import { Button } from '../form/Button';
@@ -9,10 +8,10 @@ import { UsageIndicator } from '../pricing/UsageIndicator';
 import { Link } from 'react-router-dom';
 
 export function UploadForm() {
-  const { values, errors, setFieldValue, handleSubmit, analysis, isLoading, resetForm } = useUploadForm();
-  const { canAnalyze, subscription } = useSubscription();
+  const { values, errors, setFieldValue, handleSubmit, analysis, isLoading } = useUploadForm();
+  const { canAnalyze } = useSubscription();
 
-  if (!canAnalyze()) {
+  if (!canAnalyze) {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -70,7 +69,12 @@ export function UploadForm() {
           <Button
             type="button"
             variant="secondary"
-            onClick={resetForm}
+            onClick={() => {
+              setFieldValue('candidateName', '');
+              setFieldValue('cvText', '');
+              setFieldValue('jobTitle', '');
+              setFieldValue('jobDescription', '');
+            }}
             disabled={isLoading}
           >
             Clear Form

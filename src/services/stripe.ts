@@ -1,28 +1,44 @@
 import { loadStripe } from '@stripe/stripe-js';
-import { STRIPE_CONFIG } from '../config/stripe';
 
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
 if (!stripePublicKey) {
-  console.warn('Missing Stripe public key - using mock implementation');
+  throw new Error('Missing Stripe public key');
 }
 
-export const stripe = loadStripe(stripePublicKey || 'pk_test_mock');
+export const stripe = loadStripe(stripePublicKey);
 
 export async function createCheckoutSession(userId: string, priceId: string) {
-  // Mock implementation for development
-  console.log('Creating mock checkout session for:', { userId, priceId });
+  const response = await fetch('/api/create-checkout-session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId, priceId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create checkout session');
+  }
+
+  const session = await response.json();
   return {
-    id: 'mock_checkout_session_' + Date.now(),
-    url: 'https://mock-checkout.stripe.com'
+    id: session.id,
+    url: session.url
   };
 }
 
 export async function getSubscriptionStatus(userId: string) {
-  // Mock implementation for development
+  const response = await fetch(`/api/subscription-status/${userId}`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to get subscription status');
+  }
+
+  const subscription = await response.json();
   return {
-    status: 'active',
-    plan: 'free',
-    analysisCount: 0
+    status: subscription.status,
+    plan: subscription.plan,
+    analysisCount: subscription.analysisCount
   };
 }

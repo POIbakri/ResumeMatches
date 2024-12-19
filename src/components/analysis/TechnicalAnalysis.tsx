@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Analysis, TechnicalSkill } from '../../types/models';
 
 interface TechnicalAnalysisProps {
@@ -6,7 +5,7 @@ interface TechnicalAnalysisProps {
 }
 
 export function TechnicalAnalysis({ analysis }: TechnicalAnalysisProps) {
-  const skills = analysis.technical_skills || [];
+  const skills: TechnicalSkill[] = analysis.technical_skills || [];
 
   if (!skills.length) {
     return (
@@ -16,7 +15,7 @@ export function TechnicalAnalysis({ analysis }: TechnicalAnalysisProps) {
 
   return (
     <div className="space-y-6">
-      {skills.map((skill, index) => (
+      {skills.map((skill: TechnicalSkill, index) => (
         <div key={index} className="border rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-medium text-gray-900">{skill.name}</h4>

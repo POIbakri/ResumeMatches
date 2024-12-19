@@ -1,6 +1,6 @@
 import { openai } from '../config';
 import { MODELS, MAX_TOKENS, TEMPERATURE } from '../constants';
-import { ANALYSIS_SYSTEM_PROMPT, ANALYSIS_USER_PROMPT } from '../prompts';
+import { ANALYSIS_SYSTEM_PROMPT } from '../prompts';
 import { parseAnalysisResponse } from '../parser';
 import { ApiError } from '../../errors';
 import type { AnalysisPrompt } from '../types';
@@ -16,7 +16,7 @@ export async function analyzeCV({ cvText, jobDescription }: AnalysisPrompt) {
         },
         {
           role: 'user',
-          content: ANALYSIS_USER_PROMPT(cvText, jobDescription)
+          content: `CV:\n${cvText}\n\nJob Description:\n${jobDescription}`
         }
       ],
       temperature: TEMPERATURE.BALANCED,

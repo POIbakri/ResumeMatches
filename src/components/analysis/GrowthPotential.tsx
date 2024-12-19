@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
 interface GrowthPotentialProps {

@@ -22,6 +22,11 @@ export async function analyzeWithGPT4(
   try {
     const modelConfig = MODEL_CONFIGS[model];
 
+    // Use OPENAI_MODELS to validate the model
+    if (!Object.values(OPENAI_MODELS).includes(model)) {
+      throw new Error(`Invalid model. Must be one of: ${Object.values(OPENAI_MODELS).join(', ')}`);
+    }
+
     const response = await openai.chat.completions.create({
       model,
       messages: [

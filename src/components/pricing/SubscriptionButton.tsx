@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { stripe } from '../../services/stripe';
+import { stripe } from '../../services/stripe'; 
 import { STRIPE_CONFIG } from '../../config/stripe';
 import { Button } from '../form/Button';
 import { useAuth } from '../../hooks/useAuth';
@@ -29,9 +29,24 @@ export function SubscriptionButton({ plan }: SubscriptionButtonProps) {
 
     setIsLoading(true);
     try {
-      // Mock checkout for development
-      addToast('Subscription feature will be available soon!', 'info');
-      navigate('/dashboard');
+      const stripeInstance = await stripe;
+      if (!stripeInstance) {
+        throw new Error('Stripe not initialized');
+      }
+
+      const { error } = await stripeInstance.redirectToCheckout({
+        lineItems: [{
+          price: STRIPE_CONFIG.PRICES.PRO,
+          quantity: 1
+        }],
+        mode: 'subscription',
+        successUrl: `${window.location.origin}/dashboard`,
+        cancelUrl: `${window.location.origin}/pricing`,
+      });
+
+      if (error) {
+        throw error;
+      }
     } catch (err) {
       addToast('Failed to start subscription process', 'error');
       console.error('Subscription error:', err);

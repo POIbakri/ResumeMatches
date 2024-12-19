@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function TrustedBy() {
   return (
     <div className="bg-gray-50 py-12">

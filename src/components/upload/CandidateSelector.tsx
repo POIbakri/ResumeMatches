@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useCandidateHistory } from './hooks/useCandidateHistory';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';

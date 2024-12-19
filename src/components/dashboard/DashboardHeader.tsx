@@ -1,4 +1,3 @@
-import React from 'react';
 import { User } from '@supabase/supabase-js';
 import { UserCircleIcon, BellIcon } from '@heroicons/react/24/outline';
 

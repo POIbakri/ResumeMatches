@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { useAnalysisHistory } from './hooks/useAnalysisHistory';
 import { AnalysisCard } from './AnalysisCard';
 import { AnalysisDetails } from './AnalysisDetails';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { EmptyState } from '../feedback/EmptyState';
+import { useState } from 'react';
 
 export function AnalysisHistory() {
   const { analyses, isLoading, error } = useAnalysisHistory();

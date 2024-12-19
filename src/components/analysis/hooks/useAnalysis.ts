@@ -26,11 +26,14 @@ export function useAnalysis() {
 
       const job = await uploadJob({
         title: input.jobTitle,
-        jd_text: input.jobDescription,
+        description: input.jobDescription,
         created_at: new Date().toISOString(),
       });
 
-      const result = await analyzeCandidateJob(candidate.id, job.id);
+      const result = await analyzeCandidateJob({
+        candidateId: candidate.id,
+        jobId: job.id
+      });
       setAnalysis(result);
       addToast('Analysis completed successfully', 'success');
       return result;

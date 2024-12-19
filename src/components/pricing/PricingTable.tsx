@@ -8,11 +8,6 @@ export function PricingTable() {
         <PlanCard plan={PRICING_PLANS.FREE} />
         <PlanCard plan={PRICING_PLANS.PRO} highlighted />
       </div>
-      <div className="text-center mt-8">
-        <p className="text-sm text-gray-500">
-          All plans include a 14-day money-back guarantee
-        </p>
-      </div>
     </div>
   );
 }

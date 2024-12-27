@@ -29,13 +29,16 @@ export async function analyzeCandidateJob({
 
       // Parse the response
       const analysis = parseAnalysisResponse(analysisResponse);
-
+      // Get user ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
       // Save to database
       const { data, error } = await supabase
         .from('analysis')
         .insert([{
           candidate_id: candidateId,
           job_id: jobId,
+          user_id: user.id,
           ...analysis,
           created_at: new Date().toISOString()
         }])

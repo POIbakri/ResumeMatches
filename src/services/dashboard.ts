@@ -13,17 +13,27 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new ApiError('User not authenticated', 401);
+
     const [
       { count: totalAnalyses },
       { count: totalCandidates },
       { count: totalJobs },
       { count: recentAnalyses }
     ] = await Promise.all([
-      supabase.from('analysis').select('*', { count: 'exact', head: true }),
-      supabase.from('candidates').select('*', { count: 'exact', head: true }),
-      supabase.from('jobs').select('*', { count: 'exact', head: true }),
       supabase.from('analysis')
         .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+      supabase.from('candidates')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+      supabase.from('jobs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id),
+      supabase.from('analysis')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
         .gte('created_at', oneWeekAgo.toISOString())
     ]);
 

@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { OPENAI_MODELS, MODEL_CONFIGS } from '../../config/openai/models';
-import { SYSTEM_PROMPTS } from '../../config/openai/prompts';
+import { ANALYSIS_SYSTEM_PROMPT } from './prompts';
 import { ApiError } from '../errors';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -50,7 +50,7 @@ export async function analyzeWithGPT4(
       messages: [
         {
           role: 'system',
-          content: SYSTEM_PROMPTS.CV_ANALYSIS
+          content: ANALYSIS_SYSTEM_PROMPT
         },
         {
           role: 'user',

@@ -1,7 +1,7 @@
 import { ENV } from './env';
 import { ERROR_MESSAGES } from './error-messages';
 import { OPENAI_MODELS, MODEL_CONFIGS } from './openai/models';
-import { SYSTEM_PROMPTS } from './openai/prompts';
+import { ANALYSIS_SYSTEM_PROMPT } from '../lib/openai/prompts';
 import { PRICING_PLANS } from './pricing/plans';
 import { STRIPE_CONFIG } from './pricing/stripe';
 import { ANALYSIS_LIMITS } from './pricing/limits';
@@ -13,7 +13,7 @@ export {
   ERROR_MESSAGES,
   OPENAI_MODELS,
   MODEL_CONFIGS,
-  SYSTEM_PROMPTS,
+  ANALYSIS_SYSTEM_PROMPT,
   PRICING_PLANS,
   STRIPE_CONFIG,
   ANALYSIS_LIMITS,

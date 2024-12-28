@@ -4,6 +4,7 @@ import { TechnicalAnalysis } from './TechnicalAnalysis';
 import { RiskFactors } from './RiskFactors';
 import { GrowthPotential } from './GrowthPotential';
 import { InterviewPlan } from './InterviewPlan';
+import { AnalysisSummary } from './AnalysisSummary';
 
 interface AnalysisResultsProps {
   analysis: Analysis;
@@ -14,6 +15,8 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
     <div className="space-y-8">
       <ScoreCard score={analysis.fit_score} verdict={analysis.verdict} />
       
+      <AnalysisSummary analysis={analysis} />
+
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-semibold mb-4">Technical Analysis</h3>
         <TechnicalAnalysis analysis={analysis} />

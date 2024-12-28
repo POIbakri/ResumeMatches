@@ -5,8 +5,8 @@ interface InterviewSection {
   title: string;
   duration: string;
   questions: string[];
-  redFlags: string[]; // Made required by removing optional
-  greenFlags: string[]; // Made required by removing optional
+  redFlags: string[];
+  greenFlags: string[];
 }
 
 interface InterviewPlanProps {
@@ -17,40 +17,57 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const parseSections = (plan: string): InterviewSection[] => {
-    const sections = plan.split(/(?=\w+\s*\(\d+\s*minutes?\):)/i);
-    return sections
-      .filter(Boolean)
-      .map(section => {
-        const titleMatch = section.match(/^(.*?)(?:\((\d+)\s*minutes?\):)(.*)/is);
-        if (!titleMatch) return null;
+    if (!plan) {
+      return [];
+    }
 
-        const [, title, duration, content] = titleMatch;
-        const lines = content.split('\n').filter(Boolean).map(line => line.trim());
-        
-        const questions = lines
-          .filter(line => line.startsWith('-'))
-          .map(line => line.slice(1).trim());
+    try {
+      const sections = plan.split(/(?=\w+\s*\(\d+\s*minutes?\):)/i);
+      return sections
+        .filter(Boolean)
+        .map(section => {
+          const titleMatch = section.match(/^(.*?)(?:\((\d+)\s*minutes?\):)(.*)/is);
+          if (!titleMatch) return null;
 
-        const redFlags = lines
-          .filter(line => line.toLowerCase().includes('red flag'))
-          .map(line => line.replace(/^[^:]*:\s*/, '')) || []; // Default to empty array
-        
-        const greenFlags = lines
-          .filter(line => line.toLowerCase().includes('green flag'))
-          .map(line => line.replace(/^[^:]*:\s*/, '')) || []; // Default to empty array
+          const [, title, duration, content] = titleMatch;
+          const lines = content.split('\n').filter(line => line.trim()).map(line => line.trim());
+          
+          const questions = lines
+            .filter(line => line.startsWith('-') || line.startsWith('•'))
+            .map(line => line.replace(/^[-•]\s*/, '').trim());
 
-        return {
-          title: title.trim(),
-          duration: `${duration} minutes`,
-          questions,
-          redFlags,
-          greenFlags
-        };
-      })
-      .filter((section): section is InterviewSection => section !== null);
+          const redFlags = lines
+            .filter(line => line.toLowerCase().includes('red flag'))
+            .map(line => line.replace(/^[^:]*:\s*/, '').trim()) || [];
+          
+          const greenFlags = lines
+            .filter(line => line.toLowerCase().includes('green flag'))
+            .map(line => line.replace(/^[^:]*:\s*/, '').trim()) || [];
+
+          return {
+            title: title.trim(),
+            duration: `${duration} minutes`,
+            questions,
+            redFlags,
+            greenFlags
+          };
+        })
+        .filter((section): section is InterviewSection => section !== null);
+    } catch (error) {
+      console.error('Error parsing interview plan:', error);
+      return [];
+    }
   };
 
   const sections = parseSections(plan);
+
+  if (!sections.length) {
+    return (
+      <div className="p-4 text-gray-500 text-center">
+        No interview plan available
+      </div>
+    );
+  }
 
   return (
     <div className="divide-y divide-gray-200">

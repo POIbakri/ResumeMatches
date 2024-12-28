@@ -1,4 +1,4 @@
-export const SYSTEM_PROMPTS = {
+export const ANALYSIS_SYSTEM_PROMPTS = {
   CV_ANALYSIS: `You are an expert HR professional and technical recruiter with over 15 years of experience in talent assessment across Fortune 500 companies and fast-growing startups.
 Your task is to provide a data-driven, comprehensive analysis of a candidate's CV against a job description.
 

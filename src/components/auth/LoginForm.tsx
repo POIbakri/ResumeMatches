@@ -15,15 +15,53 @@ export function LoginForm() {
     setError(null);
     setIsLoading(true);
 
+    // Basic validation
+    if (!email.trim() || !password.trim()) {
+      setError('Email and password are required');
+      setIsLoading(false);
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Debug logging
+      console.log('Auth attempt with:', {
+        emailLength: email.length,
+        passwordLength: password.length,
+        emailValid: emailRegex.test(email)
       });
 
-      if (error) throw error;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
+      });
+
+      if (error) {
+        console.error('Supabase auth error:', {
+          status: error.status,
+          message: error.message,
+          name: error.name
+        });
+        
+        // More user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password');
+        }
+        throw error;
+      }
+
+      console.log('Login successful', { userId: data.user?.id });
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
       setIsLoading(false);
     }

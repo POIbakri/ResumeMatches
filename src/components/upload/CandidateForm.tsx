@@ -1,6 +1,8 @@
 import { Input } from '../form/Input';
 import { TextArea } from '../form/TextArea';
 import { CandidateSelector } from './CandidateSelector';
+import { isDuplicateCandidate } from '../../lib/utils';
+import { useCandidateHistory } from './hooks/useCandidateHistory';
 
 interface CandidateFormProps {
   candidateName: string;
@@ -20,6 +22,24 @@ export function CandidateForm({
   onCvTextChange,
   errors = {},
 }: CandidateFormProps) {
+  const { data: candidates = [] } = useCandidateHistory();
+
+  const handleNameChange = (value: string) => {
+    if (isDuplicateCandidate(value, cvText, candidates)) {
+      // You might want to show a warning toast or message here
+      return;
+    }
+    onNameChange(value);
+  };
+
+  const handleCvTextChange = (value: string) => {
+    if (isDuplicateCandidate(candidateName, value, candidates)) {
+      // You might want to show a warning toast or message here
+      return;
+    }
+    onCvTextChange(value);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -41,7 +61,7 @@ export function CandidateForm({
         id="candidateName"
         label="Candidate Name"
         value={candidateName}
-        onChange={(e) => onNameChange(e.target.value)}
+        onChange={(e) => handleNameChange(e.target.value)}
         error={errors.name}
         placeholder="Enter candidate's full name"
         required
@@ -50,7 +70,7 @@ export function CandidateForm({
         id="cvText"
         label="CV Text"
         value={cvText}
-        onChange={(e) => onCvTextChange(e.target.value)}
+        onChange={(e) => handleCvTextChange(e.target.value)}
         error={errors.cvText}
         placeholder="Paste the candidate's CV content here..."
         required

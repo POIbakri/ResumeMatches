@@ -21,3 +21,27 @@ export function calculateStats(scores: number[]) {
     max: Math.max(...scores)
   };
 }
+
+export function isDuplicateCandidate(
+  newName: string,
+  newCvText: string,
+  existingCandidates: Array<{ name: string; cv_text: string }>
+): boolean {
+  return existingCandidates.some(
+    candidate => 
+      candidate.name.toLowerCase().trim() === newName.toLowerCase().trim() &&
+      candidate.cv_text.trim() === newCvText.trim()
+  );
+}
+
+export function isDuplicateJob(
+  newTitle: string,
+  newDescription: string,
+  existingJobs: Array<{ title: string; jd_text: string }>
+): boolean {
+  return existingJobs.some(
+    job => 
+      job.title.toLowerCase().trim() === newTitle.toLowerCase().trim() &&
+      job.jd_text.trim() === newDescription.trim()
+  );
+}

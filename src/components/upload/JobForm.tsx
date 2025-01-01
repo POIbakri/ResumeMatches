@@ -1,6 +1,8 @@
 import { Input } from '../form/Input';
 import { TextArea } from '../form/TextArea';
 import { JobSelector } from './JobSelector';
+import { isDuplicateJob } from '../../lib/utils';
+import { useJobHistory } from './hooks/useJobHistory';
 
 interface JobFormProps {
   jobTitle: string;
@@ -20,6 +22,24 @@ export function JobForm({
   onDescriptionChange,
   errors = {},
 }: JobFormProps) {
+  const { jobs } = useJobHistory();
+
+  const handleTitleChange = (value: string) => {
+    if (isDuplicateJob(value, jobDescription, jobs)) {
+      // You might want to show a warning toast or message here
+      return;
+    }
+    onTitleChange(value);
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    if (isDuplicateJob(jobTitle, value, jobs)) {
+      // You might want to show a warning toast or message here
+      return;
+    }
+    onDescriptionChange(value);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -41,7 +61,7 @@ export function JobForm({
         id="jobTitle"
         label="Job Title"
         value={jobTitle}
-        onChange={(e) => onTitleChange(e.target.value)}
+        onChange={(e) => handleTitleChange(e.target.value)}
         error={errors.title}
         placeholder="Enter the job position title"
         required
@@ -50,7 +70,7 @@ export function JobForm({
         id="jobDescription"
         label="Job Description"
         value={jobDescription}
-        onChange={(e) => onDescriptionChange(e.target.value)}
+        onChange={(e) => handleDescriptionChange(e.target.value)}
         error={errors.description}
         placeholder="Paste the job description here..."
         required

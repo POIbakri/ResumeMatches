@@ -1,11 +1,14 @@
 import { supabase } from '../lib/supabase';
 import { ApiError } from '../lib/errors';
+import { isDuplicateCandidate, isDuplicateJob } from '../lib/utils';
 
 interface DashboardStats {
   totalAnalyses: number;
+  uniqueCandidates: number;
+  uniqueJobs: number;
+  recentAnalyses: number;
   totalCandidates: number;
   totalJobs: number;
-  recentAnalyses: number;
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -18,18 +21,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     const [
       { count: totalAnalyses },
-      { count: totalCandidates },
-      { count: totalJobs },
+      { data: candidates },
+      { data: jobs },
       { count: recentAnalyses }
     ] = await Promise.all([
       supabase.from('analysis')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id),
       supabase.from('candidates')
-        .select('*', { count: 'exact', head: true })
+        .select('id, name, cv_text')
         .eq('user_id', user.id),
       supabase.from('jobs')
-        .select('*', { count: 'exact', head: true })
+        .select('id, title, jd_text')
         .eq('user_id', user.id),
       supabase.from('analysis')
         .select('*', { count: 'exact', head: true })
@@ -37,13 +40,38 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .gte('created_at', oneWeekAgo.toISOString())
     ]);
 
+    // Count unique candidates
+    const uniqueCandidates = candidates?.reduce<Array<typeof candidates[0]>>((acc, current) => {
+      const isDuplicate = acc.some(c => 
+        isDuplicateCandidate(current.name, current.cv_text, [c])
+      );
+      if (!isDuplicate) {
+        acc.push(current);
+      }
+      return acc;
+    }, []) || [];
+
+    // Count unique jobs
+    const uniqueJobs = jobs?.reduce<Array<typeof jobs[0]>>((acc, current) => {
+      const isDuplicate = acc.some(j => 
+        isDuplicateJob(current.title, current.jd_text, [j])
+      );
+      if (!isDuplicate) {
+        acc.push(current);
+      }
+      return acc;
+    }, []) || [];
+
     return {
       totalAnalyses: totalAnalyses || 0,
-      totalCandidates: totalCandidates || 0,
-      totalJobs: totalJobs || 0,
-      recentAnalyses: recentAnalyses || 0
+      uniqueCandidates: uniqueCandidates.length,
+      uniqueJobs: uniqueJobs.length,
+      recentAnalyses: recentAnalyses || 0,
+      totalCandidates: uniqueCandidates.length,
+      totalJobs: uniqueJobs.length
     };
   } catch (error) {
+    console.error('Dashboard stats error:', error);
     throw new ApiError('Failed to fetch dashboard stats', 500);
   }
 }

@@ -3,13 +3,38 @@ import { AnalysisCard } from './AnalysisCard';
 import { AnalysisDetails } from './AnalysisDetails';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { EmptyState } from '../feedback/EmptyState';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { ApiError } from '../../lib/errors';
 
 export function AnalysisHistory() {
-  const { analyses, isLoading, error } = useAnalysisHistory();
+  const { isLoading, error } = useAnalysisHistory();
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
+  const [userAnalyses, setUserAnalyses] = useState<any[]>([]);
 
-  console.log('Selected Analysis ID:', selectedAnalysis);
+  // Get current user's analyses
+  const getCurrentUserAnalyses = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new ApiError('User not authenticated', 401);
+
+      const { data, error } = await supabase
+        .from('analysis')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUserAnalyses(data || []);
+    } catch (error) {
+      console.error('Error fetching user analyses:', error);
+    }
+  };
+
+  // Load user analyses on mount
+  useEffect(() => {
+    getCurrentUserAnalyses();
+  }, []);
 
   if (isLoading) {
     return (
@@ -28,7 +53,7 @@ export function AnalysisHistory() {
     );
   }
 
-  if (!analyses.length) {
+  if (!userAnalyses.length) {
     return (
       <EmptyState
         title="No analyses yet"
@@ -48,14 +73,11 @@ export function AnalysisHistory() {
 
   return (
     <div className="space-y-4">
-      {analyses.map((analysis) => (
+      {userAnalyses.map((analysis) => (
         <AnalysisCard
           key={analysis.id}
           analysis={analysis}
-          onClick={() => {
-            console.log('Clicking analysis:', analysis.id);
-            setSelectedAnalysis(analysis.id ?? null);
-          }}
+          onClick={() => setSelectedAnalysis(analysis.id ?? null)}
         />
       ))}
     </div>

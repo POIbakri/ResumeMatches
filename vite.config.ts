@@ -14,6 +14,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           ui: ['@heroicons/react', '@headlessui/react'],
           analytics: ['./src/lib/analytics.ts'],
+          pdfworker: ['pdfjs-dist/build/pdf.worker.mjs'],
         },
       },
     },
@@ -30,5 +31,8 @@ export default defineConfig({
   preview: {
     port: 4173,
     strictPort: true,
+  },
+  optimizeDeps: {
+    include: ['pdfjs-dist/build/pdf.worker.mjs'],
   },
 });

@@ -1,8 +1,10 @@
+
 import { Input } from '../form/Input';
 import { TextArea } from '../form/TextArea';
 import { CandidateSelector } from './CandidateSelector';
 import { isDuplicateCandidate } from '../../lib/utils';
 import { useCandidateHistory } from './hooks/useCandidateHistory';
+import { FileUpload } from './FileUpload';
 
 interface CandidateFormProps {
   candidateName: string;
@@ -22,19 +24,19 @@ export function CandidateForm({
   onCvTextChange,
   errors = {},
 }: CandidateFormProps) {
-  const { data: candidates = [] } = useCandidateHistory();
+  const { candidates = [] } = useCandidateHistory();
 
   const handleNameChange = (value: string) => {
+    // If there's a duplicate candidate, you could show a warning here
     if (isDuplicateCandidate(value, cvText, candidates)) {
-      // You might want to show a warning toast or message here
       return;
     }
     onNameChange(value);
   };
 
   const handleCvTextChange = (value: string) => {
+    // If there's a duplicate candidate, you could show a warning here
     if (isDuplicateCandidate(candidateName, value, candidates)) {
-      // You might want to show a warning toast or message here
       return;
     }
     onCvTextChange(value);
@@ -56,7 +58,8 @@ export function CandidateForm({
           }}
         />
       </div>
-      
+
+      {/* Candidate Name */}
       <Input
         id="candidateName"
         label="Candidate Name"
@@ -66,13 +69,26 @@ export function CandidateForm({
         placeholder="Enter candidate's full name"
         required
       />
+
+      {/* PDF Upload for CV */}
+      <FileUpload
+        type="cv"
+        onFileSelect={() => {
+          // If you need to handle the file itself, do so here.
+        }}
+        onTextExtracted={(text) => handleCvTextChange(text)}
+        onTitleExtracted={(title) => handleNameChange(title)}
+        label="Upload CV (PDF)"
+      />
+
+      {/* CV Text */}
       <TextArea
         id="cvText"
         label="CV Text"
         value={cvText}
         onChange={(e) => handleCvTextChange(e.target.value)}
         error={errors.cvText}
-        placeholder="Paste the candidate's CV content here..."
+        placeholder="Paste the candidate's CV content here or upload a PDF above"
         required
       />
     </div>

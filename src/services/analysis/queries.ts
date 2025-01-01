@@ -5,7 +5,17 @@ import type { Analysis } from '../../types/models';
 export async function getAnalysis(analysisId: string): Promise<Analysis> {
   const { data, error } = await supabase
     .from('analysis')
-    .select('*')
+    .select(`
+      *,
+      candidates (
+        name,
+        cv_text
+      ),
+      jobs (
+        title,
+        jd_text
+      )
+    `)
     .eq('id', analysisId)
     .single();
 
@@ -13,20 +23,36 @@ export async function getAnalysis(analysisId: string): Promise<Analysis> {
     throw new ApiError('Analysis not found', 404);
   }
 
-  return data;
+  return {
+    ...data,
+    cv_summary: data.candidates?.cv_text || '',
+    job_requirements: data.jobs?.jd_text || ''
+  };
 }
 
 export async function listAnalyses(): Promise<Analysis[]> {
   const { data, error } = await supabase
     .from('analysis')
-    .select('*')
+    .select(`
+      *,
+      candidates (
+        name
+      ),
+      jobs (
+        title
+      )
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {
     throw new ApiError('Failed to fetch analyses', 500);
   }
 
-  return data || [];
+  return data?.map(analysis => ({
+    ...analysis,
+    cv_summary: '',
+    job_requirements: ''
+  })) || [];
 }
 
 export async function updateAnalysisNotes(analysisId: string, notes: string): Promise<void> {

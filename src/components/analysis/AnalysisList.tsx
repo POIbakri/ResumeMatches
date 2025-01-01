@@ -1,11 +1,14 @@
 import { useAnalysisHistory } from './hooks/useAnalysisHistory';
 import { AnalysisCard } from './AnalysisCard';
+import { AnalysisDetails } from './AnalysisDetails';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { EmptyState } from '../feedback/EmptyState';
 import { Button } from '../form/Button';
+import { useState } from 'react';
 
 export function AnalysisList() {
   const { analyses, isLoading, error, refetch } = useAnalysisHistory();
+  const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -38,13 +41,22 @@ export function AnalysisList() {
     );
   }
 
+  if (selectedAnalysis) {
+    return (
+      <AnalysisDetails
+        analysisId={selectedAnalysis}
+        onClose={() => setSelectedAnalysis(null)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       {analyses.map((analysis) => (
         <AnalysisCard
           key={analysis.id}
           analysis={analysis}
-          onClick={() => {/* Handle click */}}
+          onClick={() => setSelectedAnalysis(analysis.id ?? null)}
         />
       ))}
     </div>

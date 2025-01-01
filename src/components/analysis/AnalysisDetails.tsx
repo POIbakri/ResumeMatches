@@ -11,6 +11,8 @@ interface AnalysisDetailsProps {
 export function AnalysisDetails({ analysisId, onClose }: AnalysisDetailsProps) {
   const { analysis, isLoading, error } = useAnalysisDetails(analysisId);
 
+  console.log('AnalysisDetails render:', { analysisId, isLoading, error, analysis });
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">

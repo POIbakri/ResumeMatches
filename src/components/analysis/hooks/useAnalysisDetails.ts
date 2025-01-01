@@ -11,9 +11,10 @@ export function useAnalysisDetails(analysisId: string) {
     isLoading,
     error,
     refetch
-  } = useQuery<Analysis>(() => getAnalysis(analysisId), {
-    enabled: !!analysisId
-  });
+  } = useQuery<Analysis>(
+    () => getAnalysis(analysisId),
+    { enabled: !!analysisId }
+  );
 
   return {
     analysis,

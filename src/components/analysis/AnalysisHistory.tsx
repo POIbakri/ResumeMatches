@@ -9,6 +9,8 @@ export function AnalysisHistory() {
   const { analyses, isLoading, error } = useAnalysisHistory();
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
 
+  console.log('Selected Analysis ID:', selectedAnalysis);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -50,7 +52,10 @@ export function AnalysisHistory() {
         <AnalysisCard
           key={analysis.id}
           analysis={analysis}
-          onClick={() => setSelectedAnalysis(analysis.id ?? null)}
+          onClick={() => {
+            console.log('Clicking analysis:', analysis.id);
+            setSelectedAnalysis(analysis.id ?? null);
+          }}
         />
       ))}
     </div>

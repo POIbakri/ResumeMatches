@@ -2,6 +2,7 @@ import { useAnalysisDetails } from './hooks/useAnalysisDetails';
 import { AnalysisResults } from './AnalysisResults';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { Button } from '../form/Button';
+import { ExportButton } from './ExportButton';
 
 interface AnalysisDetailsProps {
   analysisId: string;
@@ -36,9 +37,12 @@ export function AnalysisDetails({ analysisId, onClose }: AnalysisDetailsProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Analysis Details</h2>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
+        <div className="flex gap-3">
+          <ExportButton analysis={analysis} />
+          <Button variant="secondary" onClick={onClose}>
+            Close
+          </Button>
+        </div>
       </div>
       <AnalysisResults analysis={analysis} />
     </div>

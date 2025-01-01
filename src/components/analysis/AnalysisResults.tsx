@@ -5,6 +5,8 @@ import { RiskFactors } from './RiskFactors';
 import { GrowthPotential } from './GrowthPotential';
 import { InterviewPlan } from './InterviewPlan';
 import { AnalysisSummary } from './AnalysisSummary';
+import { AnalysisNotes } from './AnalysisNotes';
+import { ExportButton } from './ExportButton';
 
 interface AnalysisResultsProps {
   analysis: Analysis;
@@ -31,6 +33,8 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
         <h3 className="text-lg font-semibold mb-4">Interview Plan</h3>
         <InterviewPlan plan={analysis.interview_plan} />
       </div>
+      <AnalysisNotes analysis={analysis} />
+      <ExportButton analysis={analysis} />
     </div>
   );
 }

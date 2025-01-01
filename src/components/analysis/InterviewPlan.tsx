@@ -10,39 +10,72 @@ interface InterviewSection {
 }
 
 interface InterviewPlanProps {
-  plan: string;
+  plan?: string;
 }
 
 export function InterviewPlan({ plan }: InterviewPlanProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
-  const parseSections = (plan: string): InterviewSection[] => {
-    if (!plan) {
+  const parseSections = (planText: string | undefined): InterviewSection[] => {
+    if (!planText) {
       return [];
     }
 
     try {
-      const sections = plan.split(/(?=\w+\s*\(\d+\s*minutes?\):)/i);
-      return sections
-        .filter(Boolean)
-        .map(section => {
-          const titleMatch = section.match(/^(.*?)(?:\((\d+)\s*minutes?\):)(.*)/is);
+      // Remove "INTERVIEW_PLAN:" prefix and normalize line endings
+      const normalizedPlan = planText
+        .replace(/^INTERVIEW_PLAN:\s*/i, '')
+        .replace(/\r\n/g, '\n')
+        .trim();
+      
+      // Split by numbered sections (e.g., "1.", "2.", etc.)
+      const rawSections = normalizedPlan.split(/(?=\d+\.\s*Question Category:)/i)
+        .filter(section => section.trim());
+
+      return rawSections
+        .map(rawSection => {
+          // Extract title and duration
+          const titleMatch = rawSection.match(/Question Category:\s*(.*?)\((\d+)\s*minutes\)/i);
           if (!titleMatch) return null;
 
-          const [, title, duration, content] = titleMatch;
-          const lines = content.split('\n').filter(line => line.trim()).map(line => line.trim());
+          const [, title, duration] = titleMatch;
           
-          const questions = lines
-            .filter(line => line.startsWith('-') || line.startsWith('•'))
-            .map(line => line.replace(/^[-•]\s*/, '').trim());
+          const questions: string[] = [];
+          const redFlags: string[] = [];
+          const greenFlags: string[] = [];
 
-          const redFlags = lines
-            .filter(line => line.toLowerCase().includes('red flag'))
-            .map(line => line.replace(/^[^:]*:\s*/, '').trim()) || [];
+          // Split into subsections
+          const lines = rawSection.split('\n').map(line => line.trim());
           
-          const greenFlags = lines
-            .filter(line => line.toLowerCase().includes('green flag'))
-            .map(line => line.replace(/^[^:]*:\s*/, '').trim()) || [];
+          let currentSection = '';
+          lines.forEach(line => {
+            if (line.startsWith('Primary Question:')) {
+              currentSection = 'primary';
+              const question = line.replace(/^Primary Question:\s*/i, '').trim();
+              if (question) questions.unshift(question);
+            } else if (line.startsWith('Follow-up Questions:')) {
+              currentSection = 'followup';
+            } else if (line.startsWith('Red Flags:')) {
+              currentSection = 'red';
+            } else if (line.startsWith('Green Flags:')) {
+              currentSection = 'green';
+            } else if (line.startsWith('Expected Answer:') || line.startsWith('Evaluation Criteria:')) {
+              currentSection = 'other';
+            } else if (line.startsWith('-') && line.length > 1) {
+              const content = line.replace(/^-\s*/, '').trim();
+              switch (currentSection) {
+                case 'followup':
+                  questions.push(content);
+                  break;
+                case 'red':
+                  redFlags.push(content);
+                  break;
+                case 'green':
+                  greenFlags.push(content);
+                  break;
+              }
+            }
+          });
 
           return {
             title: title.trim(),
@@ -53,6 +86,7 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
           };
         })
         .filter((section): section is InterviewSection => section !== null);
+
     } catch (error) {
       console.error('Error parsing interview plan:', error);
       return [];
@@ -61,10 +95,21 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
 
   const sections = parseSections(plan);
 
-  if (!sections.length) {
+  if (!plan) {
     return (
-      <div className="p-4 text-gray-500 text-center">
-        No interview plan available
+      <p className="text-sm text-gray-500 italic">Interview plan not available</p>
+    );
+  }
+
+  if (sections.length === 0) {
+    return (
+      <div className="text-gray-500 italic">
+        <p>No interview plan sections found</p>
+        {process.env.NODE_ENV === 'development' && (
+          <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
+            {JSON.stringify({ rawPlan: plan }, null, 2)}
+          </pre>
+        )}
       </div>
     );
   }
@@ -90,17 +135,19 @@ export function InterviewPlan({ plan }: InterviewPlanProps) {
 
           {expandedSection === section.title && (
             <div className="mt-4 space-y-4">
-              <div>
-                <h5 className="font-medium text-gray-700 mb-2">Questions:</h5>
-                <ul className="space-y-2">
-                  {section.questions.map((question, i) => (
-                    <li key={i} className="flex items-start space-x-2">
-                      <span className="text-blue-600 mt-1">•</span>
-                      <span className="text-gray-600">{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {section.questions.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-gray-700 mb-2">Questions:</h5>
+                  <ul className="space-y-2">
+                    {section.questions.map((question, i) => (
+                      <li key={i} className="flex items-start space-x-2">
+                        <span className="text-blue-600 mt-1">•</span>
+                        <span className="text-gray-600">{question}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {section.redFlags.length > 0 && (
                 <div>

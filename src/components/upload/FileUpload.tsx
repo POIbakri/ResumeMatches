@@ -3,8 +3,8 @@ import { DocumentArrowUpIcon } from '@heroicons/react/24/outline';
 import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-// IMPORTANT: Set the worker source for PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//mozilla.github.io/pdf.js/build/pdf.worker.js`;
+// Set worker source to local file path
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.js';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;

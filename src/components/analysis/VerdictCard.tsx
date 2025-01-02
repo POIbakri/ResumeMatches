@@ -12,37 +12,47 @@ interface VerdictCardProps {
 
 export function VerdictCard({ verdict, reasoning }: VerdictCardProps) {
   const verdictStyles = {
-    GOOD_FIT: {
+    STRONG_FIT: {
       border: 'border-green-200',
       bg: 'bg-green-50',
       icon: CheckCircleIcon,
       iconColor: 'text-green-600',
-      title: 'Good Fit',
+      title: 'Strong Fit',
       titleColor: 'text-green-800',
       textColor: 'text-green-700',
       dotColor: 'bg-green-600'
+    },
+    POTENTIAL_FIT: {
+      border: 'border-yellow-200',
+      bg: 'bg-yellow-50',
+      icon: QuestionMarkCircleIcon,
+      iconColor: 'text-yellow-600',
+      title: 'Potential Fit',
+      titleColor: 'text-yellow-800',
+      textColor: 'text-yellow-700',
+      dotColor: 'bg-yellow-600'
     },
     NEEDS_CONSIDERATION: {
       border: 'border-yellow-200',
       bg: 'bg-yellow-50',
       icon: QuestionMarkCircleIcon,
       iconColor: 'text-yellow-600',
-      title: 'Needs Further Consideration',
+      title: 'Needs Consideration',
       titleColor: 'text-yellow-800',
       textColor: 'text-yellow-700',
       dotColor: 'bg-yellow-600'
     },
-    BAD_FIT: {
+    NOT_RECOMMENDED: {
       border: 'border-red-200',
       bg: 'bg-red-50',
       icon: XCircleIcon,
       iconColor: 'text-red-600',
-      title: 'Not a Good Fit',
+      title: 'Not Recommended',
       titleColor: 'text-red-800',
       textColor: 'text-red-700',
       dotColor: 'bg-red-600'
     }
-  };
+  } as const;
 
   const style = verdictStyles[verdict];
   const Icon = style.icon;

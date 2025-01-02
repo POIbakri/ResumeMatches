@@ -1,6 +1,6 @@
 import { Analysis, Candidate, Job } from '../../types/models';
 
-class DemoStorage {
+export class DemoStorage {
   private candidates: Candidate[] = [];
   private jobs: Job[] = [];
   private analyses: Analysis[] = [];
@@ -31,7 +31,7 @@ class DemoStorage {
       candidate_id: 'candidate-1',
       job_id: 'job-1',
       fit_score: 8,
-      verdict: 'GOOD_FIT',
+      verdict: 'STRONG_FIT',
       reasoning: ['Strong technical match'],
       suggestions: ['Add more quantitative metrics'],
       interview_plan: 'Technical Assessment (30 minutes)',
@@ -42,16 +42,22 @@ class DemoStorage {
       status: 'pending',
       technical_skills: [
         {
-          name: 'React',
-          proficiency: 90,
-          assessment: 'Strong experience with modern React development'
+          skill: 'React',
+          proficiency: 'EXPERT',
+          evidence: 'Strong experience with modern React development',
+          currency: 'Current'
         }
       ],
-      risk_factors: ['Limited leadership experience'],
+      risk_factors: [{
+        severity: 'LOW',
+        description: 'Limited leadership experience',
+        mitigation: 'Provide leadership training opportunities'
+      }],
       growth_potential: {
         areas: ['Team leadership', 'System architecture'],
         recommendations: ['Consider leadership training']
-      }
+      },
+      notes: ''
     }];
   }
 

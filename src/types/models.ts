@@ -1,5 +1,3 @@
-
-
 export interface TechnicalSkill {
   skill: string;
   proficiency: 'EXPERT' | 'ADVANCED' | 'INTERMEDIATE' | 'BASIC' | 'BEGINNER';
@@ -46,6 +44,7 @@ export interface Analysis {
   questions_used: string[];
   suggestions: string[];
   status: 'pending' | 'completed' | 'error';
+  notes?: string;
 }
 
 export interface AnalysisHistory extends Analysis {

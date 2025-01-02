@@ -1,11 +1,11 @@
-import type { Analysis } from '../../types/models';
+import type { Analysis, TechnicalSkill } from '../../types/models';
 
 const DEBUG = process.env.NODE_ENV === 'development';
 
 function validateOpenAIResponse(content: string) {
   const expectedSections = [
     'FIT_SCORE',
-    'VERDICT',
+    'VERDICT', 
     'REASONING',
     'TECHNICAL_SKILLS',
     'RISK_FACTORS',
@@ -130,21 +130,6 @@ export function parseAnalysisResponse(content: string): Omit<Analysis, 'id' | 'c
       };
     };
 
-    const parseTechnicalSkills = (text: string) => {
-      return text
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.startsWith('-'))
-        .map(line => {
-          const [name, assessment] = line.slice(1).split(':').map(s => s.trim());
-          return {
-            name,
-            proficiency: calculateProficiency(assessment),
-            assessment
-          };
-        });
-    };
-
     return {
       fit_score: parseInt(fitScoreMatch[1], 10),
       verdict: verdictMatch[1] as Analysis['verdict'],
@@ -168,24 +153,48 @@ export function parseAnalysisResponse(content: string): Omit<Analysis, 'id' | 'c
   }
 }
 
-function calculateProficiency(assessment: string): number {
-  const proficiencyKeywords = {
-    expert: 90,
-    advanced: 80,
-    strong: 75,
-    good: 70,
-    intermediate: 60,
-    basic: 40,
-    limited: 30,
-    beginner: 20
-  };
+export function parseSkills(content: string): TechnicalSkill[] {
+  const skills: TechnicalSkill[] = [];
+  const skillMatches = content.matchAll(/- Skill: (.*?)\n\s*\* Proficiency: (.*?)\n\s*\* Evidence: (.*?)\n\s*\* Currency: (.*?)(?=\n-|\n\n|$)/gs);
 
-  const assessment_lower = assessment.toLowerCase();
-  for (const [keyword, score] of Object.entries(proficiencyKeywords)) {
-    if (assessment_lower.includes(keyword)) {
-      return score;
+  for (const match of skillMatches) {
+    const [, skill, proficiency, evidence, currency] = match;
+    if (skill && proficiency && evidence && currency) {
+      skills.push({
+        skill: skill.trim(),
+        proficiency: proficiency.trim().replace(/[\[\]]/g, '') as TechnicalSkill['proficiency'],
+        evidence: evidence.trim(),
+        currency: currency.trim()
+      });
     }
   }
 
-  return 50; // Default score
+  return skills;
+}
+
+function parseTechnicalSkills(content: string): TechnicalSkill[] {
+  if (!content) return [];
+
+  const skills: TechnicalSkill[] = [];
+  const skillMatches = content.matchAll(/- Skill: (.*?)\n\s*\* Proficiency: (.*?)\n\s*\* Evidence: (.*?)\n\s*\* Currency: (.*?)(?=\n-|\n\n|$)/gs);
+
+  for (const match of skillMatches) {
+    const [, skill, proficiency, evidence, currency] = match;
+    if (skill && proficiency && evidence && currency) {
+      // Clean up proficiency by removing brackets and normalizing
+      const cleanProficiency = proficiency.trim().replace(/[\[\]]/g, '').toUpperCase();
+      
+      // Validate proficiency level
+      if (['EXPERT', 'ADVANCED', 'INTERMEDIATE', 'BASIC', 'BEGINNER'].includes(cleanProficiency)) {
+        skills.push({
+          skill: skill.trim(),
+          proficiency: cleanProficiency as TechnicalSkill['proficiency'],
+          evidence: evidence.trim(),
+          currency: currency.trim()
+        });
+      }
+    }
+  }
+
+  return skills;
 }

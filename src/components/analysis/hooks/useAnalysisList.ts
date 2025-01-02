@@ -18,7 +18,7 @@ export function useAnalysisList({ filter = 'all' }: UseAnalysisListProps = {}) {
     if (filter === 'recent') {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      return new Date(analysis.created_at) >= oneWeekAgo;
+      return new Date(analysis.created_at ?? '') >= oneWeekAgo;
     }
     return true;
   });

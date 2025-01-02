@@ -1,8 +1,10 @@
+
+
 export interface TechnicalSkill {
-  name: string;
-  proficiency: number;
-  assessment: string;
-  recommendations?: string;
+  skill: string;
+  proficiency: 'EXPERT' | 'ADVANCED' | 'INTERMEDIATE' | 'BASIC' | 'BEGINNER';
+  evidence: string;
+  currency: string;
 }
 
 export type Verdict = 'STRONG_FIT' | 'POTENTIAL_FIT' | 'NEEDS_CONSIDERATION' | 'NOT_RECOMMENDED';
@@ -32,11 +34,7 @@ export interface Analysis {
   fit_score: number;
   verdict: Verdict;
   reasoning: string[];
-  technical_skills: {
-    name: string;
-    proficiency: number;
-    assessment: string;
-  }[];
+  technical_skills: TechnicalSkill[];
   risk_factors: RiskFactor[];
   growth_potential: {
     areas: string[];

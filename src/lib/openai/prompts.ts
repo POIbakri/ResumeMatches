@@ -20,11 +20,26 @@ REASONING:
 ...
 
 TECHNICAL_SKILLS:
-- [Skill Category]:
-  * Proficiency: [EXPERT|ADVANCED|INTERMEDIATE|BASIC]
+- Skill: [Skill Category]
+  * Proficiency: [EXPERT]
   * Evidence: [Specific projects/achievements]
   * Currency: [How recent/relevant]
-...
+- Skill: [Skill Category]
+  * Proficiency: [ADVANCED]
+  * Evidence: [Specific projects/achievements]
+  * Currency: [How recent/relevant]
+- Skill: [Skill Category]
+  * Proficiency: [INTERMEDIATE]
+  * Evidence: [Specific projects/achievements]
+  * Currency: [How recent/relevant]
+- Skill: [Skill Category]
+  * Proficiency: [BASIC]
+  * Evidence: [Specific projects/achievements]
+  * Currency: [How recent/relevant]
+- Skill: [Skill Category]
+  * Proficiency: [BEGINNER]
+  * Evidence: [Specific projects/achievements]
+  * Currency: [How recent/relevant]
 
 RISK_FACTORS:
 - Severity: [HIGH]

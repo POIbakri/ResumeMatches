@@ -71,7 +71,7 @@ export function exportAnalysisToPDF(analysis: Analysis) {
   // Date
   yPosition += 15;
   setFontStyle(FONT_SIZES.normal);
-  pdf.text('Date: ' + new Date(analysis.created_at).toLocaleDateString(), margin, yPosition);
+  pdf.text('Date: ' + new Date(analysis.created_at ?? '').toLocaleDateString(), margin, yPosition);
 
   // Fit Score and Verdict
   yPosition += 15;

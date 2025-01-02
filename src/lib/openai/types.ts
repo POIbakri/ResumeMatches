@@ -12,10 +12,10 @@ export interface AnalysisPrompt {
 }
 
 export interface TechnicalSkill {
-  name: string;
-  proficiency: number;
-  assessment: string;
-  recommendations?: string[];
+  skill: string;
+  proficiency: 'EXPERT' | 'ADVANCED' | 'INTERMEDIATE' | 'BASIC' | 'BEGINNER';
+  evidence: string;
+  currency: string;
 }
 
 export interface GrowthPotential {

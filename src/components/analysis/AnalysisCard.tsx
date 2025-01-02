@@ -21,7 +21,7 @@ export function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
         <div>
           <h3 className="font-medium">Candidate Analysis</h3>
           <p className="text-sm text-gray-500">
-            {new Date(analysis.created_at).toLocaleDateString()}
+            {new Date(analysis.created_at ?? '').toLocaleDateString()}
           </p>
         </div>
         <div className={`px-2 py-1 rounded text-sm ${getScoreColor(analysis.fit_score)}`}>

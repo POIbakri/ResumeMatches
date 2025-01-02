@@ -31,7 +31,7 @@ export function RecentActivity() {
                     New analysis completed
                   </p>
                   <p className="text-sm text-gray-500">
-                    {formatTimeAgo(analysis.created_at)}
+                    {formatTimeAgo(analysis.created_at ?? '')}
                   </p>
                 </div>
               </div>

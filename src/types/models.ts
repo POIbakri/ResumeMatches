@@ -5,7 +5,7 @@ export interface TechnicalSkill {
   recommendations?: string;
 }
 
-export type Verdict = 'GOOD_FIT' | 'NEEDS_CONSIDERATION' | 'BAD_FIT';
+export type Verdict = 'STRONG_FIT' | 'POTENTIAL_FIT' | 'NEEDS_CONSIDERATION' | 'NOT_RECOMMENDED';
 
 export interface InterviewQuestion {
   id: string;
@@ -18,29 +18,36 @@ export interface InterviewQuestion {
   times_used: number;
 }
 
+export interface RiskFactor {
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  description: string;
+  mitigation?: string;
+}
+
 export interface Analysis {
-  id?: string; // Make optional since it may not exist on creation
+  id: string;
   candidate_id: string;
   job_id: string;
+  created_at: string;
   fit_score: number;
   verdict: Verdict;
   reasoning: string[];
-  suggestions: string[];
-  interview_plan: string;
-  cv_summary: string;
-  job_requirements: string;
-  created_at: string;
-  questions_used: InterviewQuestion[];
-  notes?: string;
-  status: 'pending' | 'interviewed' | 'hired' | 'rejected';
-  interview_date?: string;
-  interviewer_feedback?: string;
-  technical_skills: TechnicalSkill[]; // Make required since API expects it
-  risk_factors: string[]; // Make required since API expects it
-  growth_potential: { // Make required since API expects it
+  technical_skills: {
+    name: string;
+    proficiency: number;
+    assessment: string;
+  }[];
+  risk_factors: RiskFactor[];
+  growth_potential: {
     areas: string[];
     recommendations: string[];
   };
+  interview_plan: string;
+  cv_summary: string;
+  job_requirements: string;
+  questions_used: string[];
+  suggestions: string[];
+  status: 'pending' | 'completed' | 'error';
 }
 
 export interface AnalysisHistory extends Analysis {

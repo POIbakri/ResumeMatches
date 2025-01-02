@@ -8,22 +8,26 @@ interface ScoreCardProps {
 export function ScoreCard({ score, verdict }: ScoreCardProps) {
   const getScoreStyle = () => {
     switch (verdict) {
-      case 'GOOD_FIT':
+      case 'STRONG_FIT':
         return 'text-green-600 bg-green-50 border-green-200';
+      case 'POTENTIAL_FIT':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'NEEDS_CONSIDERATION':
         return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'BAD_FIT':
+      case 'NOT_RECOMMENDED':
         return 'text-red-600 bg-red-50 border-red-200';
     }
   };
 
   const getMessage = () => {
     switch (verdict) {
-      case 'GOOD_FIT':
+      case 'STRONG_FIT':
         return 'Strong Match';
+      case 'POTENTIAL_FIT':
+        return 'Potential Match';
       case 'NEEDS_CONSIDERATION':
         return 'Potential Match';
-      case 'BAD_FIT':
+      case 'NOT_RECOMMENDED':
         return 'Not Suitable';
     }
   };

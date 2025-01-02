@@ -25,8 +25,14 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <RiskFactors factors={analysis.risk_factors} />
-        <GrowthPotential potential={analysis.growth_potential} />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold mb-4">Risk Factors</h3>
+          <RiskFactors factors={analysis.risk_factors} />
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold mb-4">Growth Potential</h3>
+          <GrowthPotential potential={analysis.growth_potential} />
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-6">

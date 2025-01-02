@@ -27,9 +27,15 @@ TECHNICAL_SKILLS:
 ...
 
 RISK_FACTORS:
-- Severity: [HIGH|MEDIUM|LOW]
+- Severity: [HIGH]
   * Description: [Specific risk]
   * Mitigation: [Possible solutions]
+- Severity: [MEDIUM] 
+  * Description: [Additional risk identified]
+  * Mitigation: [Mitigation strategy]
+- Severity: [LOW]
+  * Description: [Further risk if applicable] 
+  * Mitigation: [Corresponding mitigation plan]
 ...
 
 GROWTH_POTENTIAL:
@@ -43,25 +49,64 @@ Recommendations:
 ...
 
 INTERVIEW_PLAN:
-Provide 3-5 key interview questions, with each following this format:
+Provide 3-5 key interview questions across these categories:
 
-Question Category: [Technical|Behavioral|Problem Solving] (XX minutes)
-Primary Question: [Detailed, specific question targeting core competency]
-Expected Answer: [Key points that demonstrate competency]
-Follow-up Questions:
-- [Deeper technical probe]
-- [Edge case consideration] 
-- [Implementation details]
-Red Flags:
-- [Specific warning signs]
-- [Knowledge gaps]
-Green Flags:
-- [Ideal response indicators]
-- [Advanced understanding signals]
-Evaluation Criteria:
-- [Specific technical requirements]
-- [Communication clarity]
-- [Problem-solving approach]
+- Technical Questions:
+  1. Question Category: Technical (XX minutes)
+  Primary Question: [Detailed, specific question targeting core competency]
+  Expected Answer: [Key points that demonstrate competency]
+  Follow-up Questions:
+  - [Deeper technical probe]
+  - [Edge case consideration]
+  - [Implementation details]
+  Red Flags:
+  - [Specific warning signs]
+  - [Knowledge gaps] 
+  Green Flags:
+  - [Ideal response indicators]
+  - [Advanced understanding signals]
+  Evaluation Criteria:
+  - [Specific technical requirements]
+  - [Communication clarity]
+  - [Problem-solving approach]
+
+- Behavioral Questions:
+  2. Question Category: Behavioral (XX minutes)
+  Primary Question: [Detailed, specific question targeting core competency]
+  Expected Answer: [Key points that demonstrate competency]
+  Follow-up Questions:
+  - [Deeper behavioral probe]
+  - [Situational consideration]
+  - [Motivation assessment]
+  Red Flags:
+  - [Specific warning signs]
+  - [Behavioral gaps]
+  Green Flags:
+  - [Ideal response indicators]
+  - [Maturity signals]
+  Evaluation Criteria:
+  - [Specific behavioral requirements]
+  - [Communication style]
+  - [Cultural fit indicators]
+
+- Problem Solving Questions:
+  3. Question Category: Problem Solving (XX minutes)
+  Primary Question: [Detailed, specific question targeting core competency]
+  Expected Answer: [Key points that demonstrate competency]
+  Follow-up Questions:
+  - [Deeper analytical probe]
+  - [Edge case consideration]
+  - [Process details]
+  Red Flags:
+  - [Specific warning signs]
+  - [Analytical gaps]
+  Green Flags:
+  - [Ideal response indicators]
+  - [Advanced reasoning signals]
+  Evaluation Criteria:
+  - [Specific analytical requirements]
+  - [Problem approach]
+  - [Solution quality]
 ...`;
 
 export function createAnalysisPrompt(cvText: string, jobDescription: string): string {

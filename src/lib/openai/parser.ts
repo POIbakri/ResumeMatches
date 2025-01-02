@@ -60,6 +60,29 @@ function validateOpenAIResponse(content: string) {
   return true;
 }
 
+const parseRiskFactors = (text: string) => {
+  if (!text) return [];
+
+  return text
+    .split(/(?=^-\s*Severity:)/m)
+    .filter(Boolean)
+    .map(factor => {
+      const severityMatch = factor.match(/Severity:\s*\[?(HIGH|MEDIUM|LOW)\]?/i);
+      const descriptionMatch = factor.match(/\*\s*Description:\s*\[?([^\n\]]+)\]?/i);
+      const mitigationMatch = factor.match(/\*\s*Mitigation:\s*\[?([^\n\]]+)\]?/i);
+
+      if (severityMatch && descriptionMatch) {
+        return {
+          severity: severityMatch[1].toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW',
+          description: descriptionMatch[1].trim(),
+          mitigation: mitigationMatch?.[1]?.trim()
+        };
+      }
+      return null;
+    })
+    .filter((f): f is NonNullable<typeof f> => f !== null);
+};
+
 export function parseAnalysisResponse(content: string): Omit<Analysis, 'id' | 'candidate_id' | 'job_id' | 'created_at'> {
   try {
     // Validate the response format first
@@ -127,7 +150,7 @@ export function parseAnalysisResponse(content: string): Omit<Analysis, 'id' | 'c
       verdict: verdictMatch[1] as Analysis['verdict'],
       reasoning: parseList(reasoningMatch[1]),
       technical_skills: parseTechnicalSkills(technicalSkillsMatch?.[1] || ''),
-      risk_factors: parseList(riskFactorsMatch?.[1] || ''),
+      risk_factors: parseRiskFactors(riskFactorsMatch?.[1] || ''),
       growth_potential: parseGrowthPotential(growthPotentialMatch?.[1] || ''),
       interview_plan: interviewPlanMatch[1].trim(),
       cv_summary: '',

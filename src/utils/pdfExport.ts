@@ -19,23 +19,26 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  let yPosition = 20;
-  const margin = 20;
-  const lineHeight = 7;
+  let yPosition = 30; // Increased initial spacing
+  const margin = 25; // Increased margins
+  const lineHeight = 8; // Increased line height
   let currentPage = 1;
 
-  // Font size constants
+  // Enhanced font size constants
   const FONT_SIZES = {
-    title: 20,
-    heading: 14,
+    title: 24, // Increased title size
+    subTitle: 18, // New subtitle size
+    heading: 16, // Increased heading size
+    subHeading: 14, // New subheading size
     normal: 12,
     small: 10
   };
 
   // Helper function to set font style consistently
-  const setFontStyle = (size: number) => {
+  const setFontStyle = (size: number, isBold: boolean = false) => {
     pdf.setFontSize(size);
     pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", isBold ? 'bold' : 'normal');
   };
 
   // Helper function to add text with word wrap and page breaks
@@ -44,13 +47,13 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
     let currentY = y;
 
     for (let i = 0; i < lines.length; i++) {
-      if (currentY > pageHeight - 30) {
+      if (currentY > pageHeight - 40) { // Increased bottom margin
         addPageNumber(currentPage);
         pdf.addPage();
         currentPage++;
         addWatermark();
-        setFontStyle(FONT_SIZES.normal); // Reset font style for new page
-        currentY = 20;
+        setFontStyle(FONT_SIZES.normal);
+        currentY = 30; // Increased top margin on new pages
       }
       pdf.text(lines[i], margin, currentY);
       currentY += lineHeight;
@@ -59,9 +62,9 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
   };
 
   const addWatermark = () => {
-    pdf.setTextColor(200, 200, 200);
-    pdf.setFontSize(40);
-    pdf.text('Plus+ Talent', pageWidth/2, pageHeight/2, {
+    pdf.setTextColor(220, 220, 220); // Lighter watermark
+    pdf.setFontSize(50); // Larger watermark
+    pdf.text('TopMatchTalent.com', pageWidth/2, pageHeight/2, {
       align: 'center',
       angle: 45
     });
@@ -71,11 +74,11 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
   const addPageNumber = (pageNum: number) => {
     pdf.setFontSize(FONT_SIZES.small);
     pdf.setTextColor(128, 128, 128);
-    pdf.text(`Page ${pageNum}`, pageWidth/2, pageHeight - 10, { align: 'center' });
+    pdf.text(`Page ${pageNum}`, pageWidth/2, pageHeight - 15, { align: 'center' });
     setFontStyle(FONT_SIZES.normal);
   };
 
-  // Add this helper function at the top with other helpers
+  // Risk factor parsing helper
   const parseRiskFactor = (factor: string | RiskFactor): RiskFactor | null => {
     if (typeof factor === 'string') {
       const cleanFactor = factor.replace(/^RISK_FACTORS:\s*/i, '').trim();
@@ -133,48 +136,53 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
   // Add initial watermark
   addWatermark();
 
-  // Title with candidate name and job title
-  setFontStyle(FONT_SIZES.title);
+  // Enhanced title section with better spacing
+  setFontStyle(FONT_SIZES.title, true);
   pdf.text('Analysis Report', margin, yPosition);
   
-  yPosition += 10;
-  setFontStyle(FONT_SIZES.heading);
+  yPosition += 20; // Increased spacing after title
+  setFontStyle(FONT_SIZES.subTitle, true);
   const candidateName = candidateData?.name || `Candidate ID: ${analysis.candidate_id}`;
   pdf.text(`Candidate: ${candidateName}`, margin, yPosition);
 
-  yPosition += 7;
+  yPosition += 10;
   const jobTitle = jobData?.title || `Job ID: ${analysis.job_id}`;
   pdf.text(`Position: ${jobTitle}`, margin, yPosition);
 
-  // Date
-  yPosition += 15;
+  // Date with better spacing
+  yPosition += 20;
   setFontStyle(FONT_SIZES.normal);
   pdf.text('Date: ' + new Date(analysis.created_at ?? '').toLocaleDateString(), margin, yPosition);
 
-  // Fit Score and Verdict
-  yPosition += 15;
-  setFontStyle(FONT_SIZES.heading);
-  pdf.text('Fit Score: ' + analysis.fit_score + '/10', margin, yPosition);
+  // Enhanced score and verdict section
+  yPosition += 25;
+  setFontStyle(FONT_SIZES.subHeading, true);
+  pdf.text('Fit Score:', margin, yPosition);
+  setFontStyle(FONT_SIZES.subTitle);
+  pdf.text(analysis.fit_score + '/10', margin + 70, yPosition);
 
+  yPosition += 15;
+  setFontStyle(FONT_SIZES.subHeading, true);
+  pdf.text('Verdict:', margin, yPosition);
+  setFontStyle(FONT_SIZES.subTitle);
+  pdf.text(analysis.verdict.replace(/_/g, ' '), margin + 70, yPosition);
+
+  // Key Findings section with enhanced spacing
+  yPosition += 25;
+  setFontStyle(FONT_SIZES.heading, true);
+  pdf.text('Key Findings', margin, yPosition);
   yPosition += 10;
-  pdf.text('Verdict: ' + analysis.verdict.replace('_', ' '), margin, yPosition);
-
-  // Key Findings
-  yPosition += 15;
-  setFontStyle(FONT_SIZES.heading);
-  pdf.text('Key Findings:', margin, yPosition);
-  yPosition += 7;
   setFontStyle(FONT_SIZES.normal);
   analysis.reasoning.forEach(reason => {
     yPosition = addWrappedText('• ' + reason, yPosition);
-    yPosition += 3;
+    yPosition += 5; // Increased spacing between points
   });
 
-  // Risk Factors
+  // Risk Factors section with enhanced spacing
+  yPosition += 15;
+  setFontStyle(FONT_SIZES.heading, true);
+  pdf.text('Risk Factors', margin, yPosition);
   yPosition += 10;
-  setFontStyle(FONT_SIZES.heading);
-  pdf.text('Risk Factors:', margin, yPosition);
-  yPosition += 7;
   setFontStyle(FONT_SIZES.normal);
   
   if (!analysis.risk_factors || analysis.risk_factors.length === 0) {
@@ -188,29 +196,32 @@ export async function exportAnalysisToPDF(analysis: Analysis) {
       yPosition = addWrappedText('No significant risk factors identified.', yPosition);
     } else {
       validFactors.forEach(factor => {
-        yPosition = addWrappedText(`• ${factor.severity}: ${factor.description}`, yPosition);
+        setFontStyle(FONT_SIZES.normal, true);
+        yPosition = addWrappedText(`• ${factor.severity}:`, yPosition);
+        setFontStyle(FONT_SIZES.normal);
+        yPosition = addWrappedText(factor.description, yPosition);
         if (factor.mitigation) {
           yPosition = addWrappedText(`  Mitigation: ${factor.mitigation}`, yPosition);
         }
-        yPosition += 3;
+        yPosition += 5;
       });
     }
   }
 
-  // Interview Plan
+  // Interview Plan section with enhanced spacing
+  yPosition += 15;
+  setFontStyle(FONT_SIZES.heading, true);
+  pdf.text('Interview Plan', margin, yPosition);
   yPosition += 10;
-  setFontStyle(FONT_SIZES.heading);
-  pdf.text('Interview Plan:', margin, yPosition);
-  yPosition += 7;
   setFontStyle(FONT_SIZES.normal);
   yPosition = addWrappedText(analysis.interview_plan, yPosition);
 
-  // Add final page number and footer
+  // Enhanced footer
   addPageNumber(currentPage);
   pdf.setFontSize(FONT_SIZES.small);
-  pdf.setTextColor(128, 128, 128);
-  const footer = 'Generated by Plus+ Talent CV Analyzer';
-  pdf.text(footer, pageWidth/2, pageHeight - 20, { align: 'center' });
+  pdf.setTextColor(100, 100, 100);
+  const footer = 'Generated by TopMatchTalent.com';
+  pdf.text(footer, pageWidth/2, pageHeight - 25, { align: 'center' });
 
   // Save the PDF with new naming format
   const formattedDate = new Date().toISOString().split('T')[0];

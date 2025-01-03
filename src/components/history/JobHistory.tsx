@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useJobHistory } from '../upload/hooks/useJobHistory';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { formatDate, isDuplicateJob } from '../../lib/utils';
@@ -13,6 +14,7 @@ interface GroupedJob {
 
 export function JobHistory() {
   const { jobs, isLoading } = useJobHistory();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Group duplicates together
   const groupedJobs = jobs.reduce<GroupedJob[]>((acc, current) => {
@@ -38,6 +40,15 @@ export function JobHistory() {
     return acc;
   }, []);
 
+  const formatJDText = (text: string) => {
+    return text
+      .split(/\n\s*\n/)
+      .map(para => para.trim())
+      .filter(para => para.length > 0)
+      .map(para => para.replace(/\s+/g, ' '))
+      .join('\n\n');
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -45,7 +56,20 @@ export function JobHistory() {
   return (
     <div className="space-y-4">
       {groupedJobs.map((job) => (
-        <div key={job.id} className="bg-white p-4 rounded-lg border border-gray-200">
+        <div 
+          key={job.id} 
+          className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer 
+                     hover:border-gray-300 transition-colors"
+          onClick={() => setExpandedId(expandedId === job.id ? null : job.id)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setExpandedId(expandedId === job.id ? null : job.id);
+            }
+          }}
+        >
           <div className="flex justify-between items-start">
             <h3 className="font-medium text-gray-900">{job.title}</h3>
             {job.duplicateCount > 1 && (
@@ -57,7 +81,19 @@ export function JobHistory() {
           <p className="text-sm text-gray-500 mt-1">
             Last submitted: {formatDate(job.lastSubmitted)}
           </p>
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2">{job.jd_text}</p>
+          <div 
+            className={`text-sm text-gray-600 mt-2 
+                      ${expandedId === job.id ? '' : 'line-clamp-2'}`}
+          >
+            {formatJDText(job.jd_text).split('\n\n').map((paragraph, i) => (
+              <p key={i} className="mb-2">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <div className="mt-2 text-sm text-blue-600">
+            {expandedId === job.id ? 'Click to collapse' : 'Click to expand'}
+          </div>
         </div>
       ))}
       {!jobs.length && (

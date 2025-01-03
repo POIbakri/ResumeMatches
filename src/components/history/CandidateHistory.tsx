@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useCandidateHistory } from '../upload/hooks/useCandidateHistory';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { formatDate, isDuplicateCandidate } from '../../lib/utils';
@@ -13,6 +14,7 @@ interface GroupedCandidate {
 
 export function CandidateHistory() {
   const { candidates, isLoading } = useCandidateHistory();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Group duplicates together
   const groupedCandidates = candidates.reduce<GroupedCandidate[]>((acc, current) => {
@@ -38,6 +40,15 @@ export function CandidateHistory() {
     return acc;
   }, []);
 
+  const formatCVText = (text: string) => {
+    return text
+      .split(/\n\s*\n/)
+      .map(para => para.trim())
+      .filter(para => para.length > 0)
+      .map(para => para.replace(/\s+/g, ' '))
+      .join('\n\n');
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -45,23 +56,56 @@ export function CandidateHistory() {
   return (
     <div className="space-y-4">
       {groupedCandidates.map((candidate) => (
-        <div key={candidate.id} className="bg-white p-4 rounded-lg border border-gray-200">
+        <div 
+          key={candidate.id} 
+          className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer 
+                     hover:border-gray-300 transition-colors"
+          onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setExpandedId(expandedId === candidate.id ? null : candidate.id);
+            }
+          }}
+        >
           <div className="flex justify-between items-start">
-            <h3 className="font-medium text-gray-900">{candidate.name}</h3>
+            <h3 className="font-medium text-gray-900">
+              {candidate.name}
+            </h3>
             {candidate.duplicateCount > 1 && (
               <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
                 Submitted {candidate.duplicateCount} times
               </span>
             )}
           </div>
+
           <p className="text-sm text-gray-500 mt-1">
             Last submitted: {formatDate(candidate.lastSubmitted)}
           </p>
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2">{candidate.cv_text}</p>
+
+          <div 
+            className={`text-sm text-gray-600 mt-2 
+                      ${expandedId === candidate.id ? '' : 'line-clamp-2'}`}
+          >
+            {formatCVText(candidate.cv_text).split('\n\n').map((paragraph, i) => (
+              <p key={i} className="mb-2">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-2 text-sm text-blue-600">
+            {expandedId === candidate.id ? 'Click to collapse' : 'Click to expand'}
+          </div>
         </div>
       ))}
+
       {!candidates.length && (
-        <p className="text-gray-500 text-center py-4">No previous candidates found</p>
+        <p className="text-gray-500 text-center py-4">
+          No previous candidates found
+        </p>
       )}
     </div>
   );

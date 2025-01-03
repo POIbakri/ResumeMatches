@@ -7,6 +7,7 @@ import { InterviewPlan } from './InterviewPlan';
 import { AnalysisSummary } from './AnalysisSummary';
 import { AnalysisNotes } from './AnalysisNotes';
 import { ExportButton } from './ExportButton';
+import { VerdictCard } from './VerdictCard';
 
 interface AnalysisResultsProps {
   analysis: Analysis;
@@ -16,6 +17,7 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
   return (
     <div className="space-y-8">
       <ScoreCard score={analysis.fit_score} verdict={analysis.verdict} />
+      <VerdictCard verdict={analysis.verdict} reasoning={analysis.reasoning} />
       
       <AnalysisSummary analysis={analysis} />
 

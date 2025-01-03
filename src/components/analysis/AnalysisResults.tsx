@@ -78,7 +78,7 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
       </div>
 
       <div className="space-y-4">
-        <ExpandableSection title="Analysis Summary" defaultExpanded={false}>
+        <ExpandableSection title="Candidate X Position" defaultExpanded={false}>
           <AnalysisSummary analysis={analysis} />
         </ExpandableSection>
 

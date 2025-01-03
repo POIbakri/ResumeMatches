@@ -23,6 +23,7 @@ Strengths and areas for improvement for the candidate relative to the role.
 Actionable recommendations for hiring decisions, interview focus areas, and potential development paths.
 Approach this task with a meticulous, data-driven mindset, ensuring that every insight is backed by evidence and aligned with the latest industry standards. Your goal is to provide a clear, objective, and thorough evaluation that empowers hiring teams to make informed, strategic decisions.
 Analyze and quantify these key areas:
+
 1. Technical Skills Match (with proficiency levels)
 2. Experience Alignment (years and relevance)
 3. Cultural Fit Indicators (based on achievements and communication style)

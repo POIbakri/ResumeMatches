@@ -4,7 +4,6 @@ import {
   DocumentTextIcon,
   BriefcaseIcon,
   ChartBarIcon,
-  ClockIcon
 } from '@heroicons/react/24/outline';
 
 export function DashboardStats() {
@@ -34,19 +33,12 @@ export function DashboardStats() {
       textColor: 'text-green-600'
     },
     {
-      label: 'Jobs',
+      label: 'Job Descriptions',
       value: stats.totalJobs,
       icon: BriefcaseIcon,
       color: 'bg-gradient-to-br from-purple-500 to-purple-600',
       textColor: 'text-purple-600'
     },
-    {
-      label: 'Recent Analyses',
-      value: stats.recentAnalyses,
-      icon: ClockIcon,
-      color: 'bg-gradient-to-br from-orange-500 to-orange-600',
-      textColor: 'text-orange-600'
-    }
   ];
 
   return (

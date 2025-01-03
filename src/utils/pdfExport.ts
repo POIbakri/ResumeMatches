@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import type { Analysis } from '../types/models';
+import type { Analysis, RiskFactor } from '../types/models';
 
 export function exportAnalysisToPDF(analysis: Analysis) {
   const pdf = new jsPDF();
@@ -61,6 +61,61 @@ export function exportAnalysisToPDF(analysis: Analysis) {
     setFontStyle(FONT_SIZES.normal);
   };
 
+  // Add this helper function at the top with other helpers
+  const parseRiskFactor = (factor: string | RiskFactor): RiskFactor | null => {
+    if (typeof factor === 'string') {
+      const cleanFactor = factor.replace(/^RISK_FACTORS:\s*/i, '').trim();
+
+      // Try parsing as JSON first
+      try {
+        const maybeJson = JSON.parse(cleanFactor);
+        if (maybeJson && typeof maybeJson === 'object') {
+          return {
+            severity: (maybeJson.severity || 'MEDIUM').toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW',
+            description: maybeJson.description || '',
+            mitigation: maybeJson.mitigation || undefined
+          };
+        }
+      } catch (e) {
+        // Not JSON, continue with other parsing methods
+      }
+
+      // Try parsing structured text
+      const mainPattern = /^-\s*Severity:\s*\[?(HIGH|MEDIUM|LOW)\]?\s*\n\s*\*\s*Description:\s*\[?([^\n\]]+)\]?\s*\n\s*\*\s*Mitigation:\s*\[?([^\n\]]+)\]?/im;
+      const match = cleanFactor.match(mainPattern);
+      
+      if (match) {
+        const [, severity, description, mitigation] = match;
+        return {
+          severity: severity.toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW',
+          description: description.trim(),
+          mitigation: mitigation?.trim()
+        };
+      }
+
+      // Fallback to basic parsing
+      const severityMatch = cleanFactor.match(/Severity:\s*\[?(HIGH|MEDIUM|LOW)\]?/i);
+      const descriptionMatch = cleanFactor.match(/Description:\s*\[?([^\n\]]+)\]?/i);
+      const mitigationMatch = cleanFactor.match(/Mitigation:\s*\[?([^\n\]]+)\]?/i);
+
+      if (severityMatch || descriptionMatch) {
+        return {
+          severity: (severityMatch?.[1]?.toUpperCase() || 'MEDIUM') as 'HIGH' | 'MEDIUM' | 'LOW',
+          description: descriptionMatch?.[1]?.trim() || cleanFactor,
+          mitigation: mitigationMatch?.[1]?.trim()
+        };
+      }
+
+      // Last resort fallback
+      return {
+        severity: 'MEDIUM',
+        description: cleanFactor
+      };
+    }
+
+    return factor as RiskFactor;
+  };
+
   // Add initial watermark
   addWatermark();
 
@@ -92,16 +147,32 @@ export function exportAnalysisToPDF(analysis: Analysis) {
     yPosition += 3;
   });
 
-  // Suggestions
+  // Risk Factors
   yPosition += 10;
   setFontStyle(FONT_SIZES.heading);
-  pdf.text('Improvement Suggestions:', margin, yPosition);
+  pdf.text('Risk Factors:', margin, yPosition);
   yPosition += 7;
   setFontStyle(FONT_SIZES.normal);
-  analysis.suggestions.forEach(suggestion => {
-    yPosition = addWrappedText('• ' + suggestion, yPosition);
-    yPosition += 3;
-  });
+  
+  if (!analysis.risk_factors || analysis.risk_factors.length === 0) {
+    yPosition = addWrappedText('No significant risk factors identified.', yPosition);
+  } else {
+    const validFactors = analysis.risk_factors
+      .map(factor => parseRiskFactor(factor))
+      .filter((factor): factor is RiskFactor => factor !== null);
+
+    if (validFactors.length === 0) {
+      yPosition = addWrappedText('No significant risk factors identified.', yPosition);
+    } else {
+      validFactors.forEach(factor => {
+        yPosition = addWrappedText(`• ${factor.severity}: ${factor.description}`, yPosition);
+        if (factor.mitigation) {
+          yPosition = addWrappedText(`  Mitigation: ${factor.mitigation}`, yPosition);
+        }
+        yPosition += 3;
+      });
+    }
+  }
 
   // Interview Plan
   yPosition += 10;

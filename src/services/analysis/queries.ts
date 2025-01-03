@@ -26,7 +26,8 @@ export async function getAnalysis(analysisId: string): Promise<Analysis> {
   return {
     ...data,
     cv_summary: data.candidates?.cv_text || '',
-    job_requirements: data.jobs?.jd_text || ''
+    job_requirements: data.jobs?.jd_text || '',
+
   };
 }
 
@@ -51,7 +52,8 @@ export async function listAnalyses(): Promise<Analysis[]> {
   return data?.map(analysis => ({
     ...analysis,
     cv_summary: '',
-    job_requirements: ''
+    job_requirements: '',
+
   })) || [];
 }
 

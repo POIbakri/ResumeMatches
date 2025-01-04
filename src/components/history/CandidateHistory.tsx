@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useCandidateHistory } from '../upload/hooks/useCandidateHistory';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { formatDate, isDuplicateCandidate } from '../../lib/utils';
+import { UsersIcon, ChevronDownIcon, ChevronUpIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { EmptyState } from '../feedback/EmptyState';
 
 interface GroupedCandidate {
   id: string;
@@ -50,63 +52,113 @@ export function CandidateHistory() {
   };
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex justify-center items-center min-h-[400px] bg-white/50 rounded-xl backdrop-blur-sm">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!candidates.length) {
+    return (
+      <EmptyState
+        title="No candidates yet"
+        description="Previous candidates will appear here once you analyze their CVs."
+      />
+    );
   }
 
   return (
-    <div className="space-y-4">
-      {groupedCandidates.map((candidate) => (
-        <div 
-          key={candidate.id} 
-          className="bg-white p-4 rounded-lg border border-gray-200 cursor-pointer 
-                     hover:border-gray-300 transition-colors"
-          onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              setExpandedId(expandedId === candidate.id ? null : candidate.id);
-            }
-          }}
-        >
-          <div className="flex justify-between items-start">
-            <h3 className="font-medium text-gray-900">
-              {candidate.name}
-            </h3>
-            {candidate.duplicateCount > 1 && (
-              <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                Submitted {candidate.duplicateCount} times
-              </span>
-            )}
-          </div>
-
-          <p className="text-sm text-gray-500 mt-1">
-            Last submitted: {formatDate(candidate.lastSubmitted)}
-          </p>
-
-          <div 
-            className={`text-sm text-gray-600 mt-2 
-                      ${expandedId === candidate.id ? '' : 'line-clamp-2'}`}
-          >
-            {formatCVText(candidate.cv_text).split('\n\n').map((paragraph, i) => (
-              <p key={i} className="mb-2">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-
-          <div className="mt-2 text-sm text-blue-600">
-            {expandedId === candidate.id ? 'Click to collapse' : 'Click to expand'}
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl p-6 border border-emerald-100">
+        <div className="flex items-center gap-3">
+          <UsersIcon className="w-6 h-6 text-emerald-600" />
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Candidate History</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {groupedCandidates.length} unique candidate{groupedCandidates.length !== 1 ? 's' : ''} found
+            </p>
           </div>
         </div>
-      ))}
+      </div>
 
-      {!candidates.length && (
-        <p className="text-gray-500 text-center py-4">
-          No previous candidates found
-        </p>
-      )}
+      <div className="grid gap-4">
+        {groupedCandidates.map((candidate, index) => (
+          <div 
+            key={candidate.id} 
+            className="group bg-white rounded-xl border border-gray-200 hover:border-emerald-200 shadow-sm hover:shadow-md transition-all duration-200"
+            style={{
+              animationDelay: `${index * 50}ms`,
+              animation: 'fadeInUp 0.5s ease-out forwards'
+            }}
+          >
+            <div
+              className="p-6 cursor-pointer"
+              onClick={() => setExpandedId(expandedId === candidate.id ? null : candidate.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setExpandedId(expandedId === candidate.id ? null : candidate.id);
+                }
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {candidate.name}
+                  </h3>
+                  {candidate.duplicateCount > 1 && (
+                    <span className="flex items-center gap-1 text-xs px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full">
+                      <DocumentDuplicateIcon className="w-3 h-3" />
+                      {candidate.duplicateCount}x
+                    </span>
+                  )}
+                </div>
+                {expandedId === candidate.id ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                )}
+              </div>
+
+              <p className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
+                Last submitted {formatDate(candidate.lastSubmitted)}
+              </p>
+
+              <div 
+                className={`mt-4 text-sm text-gray-600 space-y-3
+                  ${expandedId === candidate.id ? '' : 'line-clamp-2'}`}
+              >
+                {formatCVText(candidate.cv_text).split('\n\n').map((paragraph, i) => (
+                  <p key={i} className="leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+
+              <div className="mt-4 text-sm text-emerald-600 font-medium">
+                {expandedId === candidate.id ? 'Show less' : 'Show more'}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

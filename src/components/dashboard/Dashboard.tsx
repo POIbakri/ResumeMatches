@@ -21,10 +21,10 @@ export function Dashboard() {
   const { session } = useAuth();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <DashboardHeader user={session?.user} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <DashboardStats />
         </div>
@@ -33,7 +33,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6">
           <Tabs
             tabs={tabs}
@@ -41,7 +41,7 @@ export function Dashboard() {
             onChange={setActiveTab}
           />
           
-          <div className="mt-6">
+          <div className="mt-8">
             {activeTab === 'new' && <UploadForm />}
             {activeTab === 'history' && <AnalysisHistory />}
             {activeTab === 'candidates' && <CandidateHistory />}

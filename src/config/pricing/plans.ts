@@ -17,7 +17,7 @@ export const FREE_PLAN: PricingPlan = {
 export const PRO_PLAN: PricingPlan = {
   id: 'pro',
   name: 'Pro Plan',
-  price: 20,
+  price: 9.99,
   period: 'month',
   analysisLimit: 1000,
   features: [
@@ -28,8 +28,8 @@ export const PRO_PLAN: PricingPlan = {
     'Team collaboration',
     'Priority support',
     'Analytics dashboard',
-    'Bulk analysis',
-    'API access'
+    'Bulk analysis - Coming soon',
+    'API access - Coming soon'
   ]
 };
 

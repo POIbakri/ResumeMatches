@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './auth/useAuth';
 import { getSubscriptionStatus, getRemainingAnalyses, canPerformAnalysis } from '../services/pricing/subscription';
-import type { SubscriptionStatus } from '../config/pricing/types';
+import type { SubscriptionStatus, PlanId } from '../config/pricing/types';
 
 export function useSubscription() {
   const { session } = useAuth();
@@ -15,7 +15,14 @@ export function useSubscription() {
     async function fetchSubscription() {
       if (!session?.user) {
         if (isMounted) {
-          setSubscription(null);
+          // Set a basic free subscription for non-authenticated users
+          setSubscription({
+            status: 'active',
+            plan: 'free',
+            analysisCount: 0,
+            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            cancelAtPeriodEnd: false
+          });
           setLoading(false);
         }
         return;
@@ -28,6 +35,11 @@ export function useSubscription() {
         const status = await getSubscriptionStatus(session.user.id);
         
         if (isMounted) {
+          // Validate subscription data
+          if (!status || !['active', 'inactive', 'trialing'].includes(status.status)) {
+            throw new Error('Invalid subscription data received');
+          }
+          
           setSubscription(status);
           setError(null);
         }
@@ -35,10 +47,10 @@ export function useSubscription() {
         console.error('Subscription fetch error:', err);
         if (isMounted) {
           setError(err instanceof Error ? err : new Error('Failed to fetch subscription'));
-          // Set default subscription state on error
+          // Set default subscription state on error with more restrictive settings
           setSubscription({
             status: 'active',
-            plan: 'free',
+            plan: 'free' as PlanId,
             analysisCount: 0,
             currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
           });
@@ -52,8 +64,12 @@ export function useSubscription() {
 
     fetchSubscription();
 
+    // Set up subscription refresh interval
+    const refreshInterval = setInterval(fetchSubscription, 60000); // Refresh every minute
+
     return () => {
       isMounted = false;
+      clearInterval(refreshInterval);
     };
   }, [session]);
 
@@ -62,6 +78,7 @@ export function useSubscription() {
     loading,
     error,
     canAnalyze: subscription ? canPerformAnalysis(subscription) : false,
-    remainingAnalyses: subscription ? getRemainingAnalyses(subscription) : 0
+    remainingAnalyses: subscription ? getRemainingAnalyses(subscription) : 0,
+    isPro: subscription?.plan === 'pro'
   };
 }

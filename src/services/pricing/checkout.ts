@@ -1,5 +1,6 @@
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import type { PlanId } from '../../config/pricing/types';
+import { SUBSCRIPTION_PRICES } from '../../lib/stripe';
 
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
@@ -10,37 +11,40 @@ if (!stripePublicKey) {
 const stripePromise = loadStripe(stripePublicKey);
 
 export async function createCheckoutSession(userId: string, planId: PlanId) {
-  const response = await fetch('/api/create-checkout-session', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ 
-      userId,
-      planId,
-      metadata: {
-        planId: planId
-      },
-      clientReferenceId: userId
-    }),
-  });
+  try {
+    const stripe = await stripePromise;
+    if (!stripe) {
+      throw new Error('Stripe failed to load');
+    }
 
-  if (!response.ok) {
-    throw new Error('Failed to create checkout session');
-  }
+    // Only proceed with checkout for paid plans
+    if (planId === 'free') {
+      throw new Error('Cannot create checkout session for free plan');
+    }
 
-  const session = await response.json();
-  
-  const stripe = await stripePromise;
-  if (!stripe) {
-    throw new Error('Stripe failed to load');
-  }
+    const priceId = planId === 'pro' ? SUBSCRIPTION_PRICES.PRO : null;
+    if (!priceId) {
+      throw new Error('Invalid plan selected');
+    }
 
-  const result = await stripe.redirectToCheckout({
-    sessionId: session.id
-  });
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [{
+        price: priceId,
+        quantity: 1
+      }],
+      mode: 'subscription',
+      successUrl: `${window.location.origin}/dashboard?success=true`,
+      cancelUrl: `${window.location.origin}/pricing?canceled=true`,
+      clientReferenceId: userId,
+      customerEmail: undefined, // Will be populated by Stripe based on the logged-in user
+    });
 
-  if (result.error) {
-    throw new Error(result.error.message);
+    if (error) {
+      console.error('Stripe checkout error:', error);
+      throw new Error(error.message || 'Failed to start checkout process');
+    }
+  } catch (error) {
+    console.error('Checkout error:', error);
+    throw new Error('Failed to start checkout process');
   }
 }

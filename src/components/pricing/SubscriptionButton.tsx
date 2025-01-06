@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { stripe } from '../../services/stripe'; 
-import { STRIPE_CONFIG } from '../../config/stripe';
+import { createCheckoutSession } from '../../services/pricing/checkout';
 import { Button } from '../form/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -29,24 +28,7 @@ export function SubscriptionButton({ plan }: SubscriptionButtonProps) {
 
     setIsLoading(true);
     try {
-      const stripeInstance = await stripe;
-      if (!stripeInstance) {
-        throw new Error('Stripe not initialized');
-      }
-
-      const { error } = await stripeInstance.redirectToCheckout({
-        lineItems: [{
-          price: STRIPE_CONFIG.PRICES.PRO,
-          quantity: 1
-        }],
-        mode: 'subscription',
-        successUrl: `${window.location.origin}/dashboard`,
-        cancelUrl: `${window.location.origin}/pricing`,
-      });
-
-      if (error) {
-        throw error;
-      }
+      await createCheckoutSession(session.user.id, plan);
     } catch (err) {
       addToast('Failed to start subscription process', 'error');
       console.error('Subscription error:', err);

@@ -6,9 +6,12 @@ import { DashboardLayout } from './components/layout/DashboardLayout';
 import { PricingPage } from './components/pricing/PricingPage';
 import { useAuth } from './hooks/useAuth';
 import { LoadingSpinner } from './components/feedback/LoadingSpinner';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 export default function App() {
   const { session, loading } = useAuth();
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
   if (loading) {
     return (
@@ -19,6 +22,7 @@ export default function App() {
   }
 
   return (
+    <Elements stripe={stripePromise}>
     <Routes>
       {/* Public routes */}
       <Route path="/" element={!session ? <LandingPage /> : <Navigate to="/dashboard" />} />
@@ -35,5 +39,6 @@ export default function App() {
       {/* Catch-all redirect */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+    </Elements>
   );
 }

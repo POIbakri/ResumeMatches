@@ -9,7 +9,8 @@ if (!STRIPE_PUBLIC_KEY) {
 export const stripe = loadStripe(STRIPE_PUBLIC_KEY);
 
 export const SUBSCRIPTION_PRICES = {
-  PRO: 'price_1234567890', // Replace with your actual Stripe price ID
+  // PRO: 'price_1QeA8NDCDYG5RrkYDlGDFzVF', 
+  PRO: 'price_1QeARbDCDYG5RrkY6kSqLkmL', 
 };
 
 export const MAX_FREE_ANALYSES = 4;

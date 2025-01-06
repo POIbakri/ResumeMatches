@@ -1,6 +1,7 @@
 export const STRIPE_CONFIG = {
   PRICES: {
-    PRO: 'price_mock_monthly_pro_plan',
+    // PRO: 'price_1QeA8NDCDYG5RrkYDlGDFzVF',
+    PRO: 'price_1QeARbDCDYG5RrkY6kSqLkmL',
   },
   MAX_FREE_ANALYSES: 4,
 };

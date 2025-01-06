@@ -14,4 +14,5 @@ export interface SubscriptionStatus {
   plan: PlanId;
   analysisCount: number;
   currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
 }

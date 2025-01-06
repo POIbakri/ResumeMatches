@@ -10,7 +10,7 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
   try {
     const { data, error } = await supabase
       .from('subscriptions')
-      .select('status, plan, analysis_count, current_period_end')
+      .select('status, plan, analysis_count, current_period_end, cancel_at_period_end')
       .eq('user_id', userId)
       .maybeSingle();
 
@@ -26,16 +26,22 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
         status: 'active',
         plan: 'free',
         analysisCount: 0,
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        cancelAtPeriodEnd: false
       };
     }
 
+    // Check if subscription is in grace period
+    const isGracePeriod = data.cancel_at_period_end && 
+      new Date(data.current_period_end) > new Date();
+
     // Ensure the response matches our expected format
     return {
-      status: data.status || 'active',
+      status: isGracePeriod ? 'active' : data.status || 'active',
       plan: data.plan || 'free',
       analysisCount: data.analysis_count || 0,
-      currentPeriodEnd: data.current_period_end || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      currentPeriodEnd: data.current_period_end || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      cancelAtPeriodEnd: data.cancel_at_period_end || false
     };
 
   } catch (error) {
@@ -45,13 +51,22 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
       status: 'active',
       plan: 'free',
       analysisCount: 0,
-      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      cancelAtPeriodEnd: false
     };
   }
 }
 
 export async function getRemainingAnalyses(subscription: SubscriptionStatus): Promise<number> {
   try {
+    // If subscription is cancelled but in grace period, still allow usage
+    if (subscription.cancelAtPeriodEnd) {
+      const periodEnd = new Date(subscription.currentPeriodEnd || '');
+      if (periodEnd < new Date()) {
+        return 0;
+      }
+    }
+
     const plan = subscription.plan.toUpperCase() as keyof typeof ANALYSIS_LIMITS;
     const limit = ANALYSIS_LIMITS[plan];
     return Math.max(0, limit - (subscription.analysisCount || 0));
@@ -64,6 +79,15 @@ export async function getRemainingAnalyses(subscription: SubscriptionStatus): Pr
 export function canPerformAnalysis(subscription: SubscriptionStatus): boolean {
   try {
     if (!subscription || subscription.status !== 'active') return false;
+
+    // Check if subscription is cancelled and period has ended
+    if (subscription.cancelAtPeriodEnd) {
+      const periodEnd = new Date(subscription.currentPeriodEnd || '');
+      if (periodEnd < new Date()) {
+        return false;
+      }
+    }
+
     const plan = subscription.plan.toUpperCase() as keyof typeof ANALYSIS_LIMITS;
     const limit = ANALYSIS_LIMITS[plan];
     return (subscription.analysisCount || 0) < limit;

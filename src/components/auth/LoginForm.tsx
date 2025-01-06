@@ -9,6 +9,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +70,7 @@ export function LoginForm() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           id="email"
           type="email"
@@ -77,30 +78,47 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="shadow-sm"
         />
 
-        <Input
-          id="password"
-          type="password"
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="shadow-sm"
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-9 text-gray-500 hover:text-gray-700 p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
 
         {error && (
-          <div className="text-red-600 text-sm">{error}</div>
+          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100">
+            {error}
+          </div>
         )}
 
-        <Button type="submit" isLoading={isLoading}>
+        <Button 
+          type="submit" 
+          isLoading={isLoading}
+          className="w-full py-2.5 text-base font-medium shadow-sm"
+        >
           Sign In
         </Button>
       </form>
 
-      <div className="text-center">
+      <div className="text-center pt-2">
         <p className="text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:text-blue-700">
+          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
             Sign up
           </Link>
         </p>

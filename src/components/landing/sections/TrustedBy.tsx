@@ -20,11 +20,11 @@ export function TrustedBy() {
 
         <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-6 lg:grid-cols-5 gap-4 xs:gap-6 sm:gap-8">
           {[
-            { src: "/logos/microsoft.svg", alt: "Microsoft" },
-            { src: "/logos/google.svg", alt: "Google" },
-            { src: "/logos/amazon.svg", alt: "Amazon" },
-            { src: "/logos/meta.svg", alt: "Meta" },
-            { src: "/logos/apple.svg", alt: "Apple" }
+            { src: "/images/SnapInc.jpg", alt: "Snap Inc" },
+            { src: "/images/Pfizer.png", alt: "Pfizer" },
+            { src: "/images/GS.png", alt: "Goldman Sachs" },
+            { src: "/images/Alphabet.png", alt: "Alphabet" },
+            { src: "/images/Adecco.png", alt: "Adecco" }
           ].map((logo, i) => (
             <div key={i} className="col-span-1 flex justify-center items-center md:col-span-2 lg:col-span-1">
               <div className="relative group w-full max-w-[120px] xs:max-w-[140px] sm:max-w-[160px]">

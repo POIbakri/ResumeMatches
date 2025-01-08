@@ -36,22 +36,22 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      console.log('Attempting signup with:', { email, redirectTo: `${window.location.origin}/auth/callback` });
-      
-      const { data, error } = await supabase.auth.signUp({
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email,
+          }
         },
       });
 
-      console.log('Signup response:', { data, error });
+      if (authError) throw authError;
 
-      if (error) throw error;
-
-      if (data?.user) {
-        setSuccessMessage('Please check your emails for confirmation (Check your junk folder)');
+      if (authData?.user) {
+        setSuccessMessage('Please check your email for confirmation (Check your junk folder)');
       }
     } catch (err) {
       console.error('Signup error:', err);

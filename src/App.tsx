@@ -8,6 +8,7 @@ import { useAuth } from './hooks/useAuth';
 import { LoadingSpinner } from './components/feedback/LoadingSpinner';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { CheckoutSuccess } from './components/checkout/CheckoutSuccess';
 
 export default function App() {
   const { session, loading } = useAuth();
@@ -34,6 +35,10 @@ export default function App() {
       <Route
         path="/dashboard/*"
         element={session ? <DashboardLayout /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/checkout/success"
+        element = {<CheckoutSuccess/>}
       />
 
       {/* Catch-all redirect */}

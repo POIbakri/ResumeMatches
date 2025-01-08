@@ -1,12 +1,13 @@
-export type SubscriptionStatus = 'active' | 'trialing' | 'past_due' | 'canceled';
-export type SubscriptionPlan = 'free' | 'pro';
-
 export interface Subscription {
   id: string;
-  status: SubscriptionStatus;
-  plan: SubscriptionPlan;
-  analysisCount: number;
-  currentPeriodEnd?: string;
+  user_id: string;
+  stripe_subscription_id: string;
+  plan: 'free' | 'pro';
+  status: 'active' | 'canceled';
+  analysis_count: number;
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
 }
 
 export interface SubscriptionHook {

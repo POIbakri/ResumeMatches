@@ -1,59 +1,36 @@
 import { User } from '@supabase/supabase-js';
 import { UserCircleIcon, BellIcon } from '@heroicons/react/24/outline';
 import { useState, useRef, useEffect } from 'react';
-import { createCheckoutSession } from '../../services/pricing/checkout';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useSubscription } from '../../hooks/useSubscription';
+import { MAX_FREE_ANALYSES } from '../../lib/stripe';
 
-interface DashboardHeaderProps {
-  user?: User | null;
-  subscription?: {
-    plan: string;
-    status: string;
-    stripeSubscriptionId?: string;
-  };
-  onSubscriptionUpdate?: () => void;
-}
-
-export function DashboardHeader({ user, subscription, onSubscriptionUpdate }: DashboardHeaderProps) {
+export function DashboardHeader({ user }: { user: User | null }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleUpgrade = async () => {
-    try {
-      setIsLoading(true);
-      if (!user?.id) throw new Error('User ID is required');
-      await createCheckoutSession(user.id, 'pro');
-    } catch (error) {
-      console.error('Error upgrading:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const navigate = useNavigate();
+  const { subscription, refetchSubscription } = useSubscription();
 
   const handleCancelSubscription = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.functions.invoke('cancel-subscription', {
-        body: { subscriptionId: subscription?.stripeSubscriptionId }
-      });
       
+      // Update subscription status in database
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({
+          status: 'canceled',
+          cancel_at_period_end: true,
+          current_period_end: new Date().toISOString() // or keep existing end date
+        })
+        .eq('user_id', user?.id);
+
       if (error) throw error;
       
-      if (onSubscriptionUpdate) {
-        onSubscriptionUpdate();
-      }
+      await refetchSubscription();
+      navigate('/pricing');
     } catch (error) {
       console.error('Error cancelling subscription:', error);
     } finally {
@@ -62,17 +39,16 @@ export function DashboardHeader({ user, subscription, onSubscriptionUpdate }: Da
     }
   };
 
-  const userName = user?.email?.split('@')[0];
-  const userEmail = user?.email;
-
-  if (!user) return null;
+  const isSubscriptionActive = subscription?.status === 'active';
+  const hasReachedLimit = (subscription?.analysis_count ?? 0) >= MAX_FREE_ANALYSES;
+  const showUpgradeButton = !isSubscriptionActive || hasReachedLimit;
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
         <div className="text-white">
           <h1 className="text-3xl font-bold">
-            Welcome back, {userName}! 👋
+            Welcome back, {user?.email?.split('@')[0]}! 👋
           </h1>
           <p className="mt-2 text-blue-100 font-medium">
             Here's your recruitment analysis overview
@@ -91,7 +67,7 @@ export function DashboardHeader({ user, subscription, onSubscriptionUpdate }: Da
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center bg-white/10 rounded-lg p-2 backdrop-blur-sm hover:bg-white/20 transition-colors duration-200"
             >
-              {user.user_metadata?.avatar_url ? (
+              {user?.user_metadata?.avatar_url ? (
                 <img 
                   src={user.user_metadata.avatar_url}
                   alt="Profile"
@@ -101,7 +77,7 @@ export function DashboardHeader({ user, subscription, onSubscriptionUpdate }: Da
                 <UserCircleIcon className="h-10 w-10 text-blue-100" />
               )}
               <div className="ml-3">
-                <p className="text-sm font-medium text-white">{userEmail}</p>
+                <p className="text-sm font-medium text-white">{user?.email}</p>
                 <p className="text-xs text-blue-100">View Profile</p>
               </div>
             </button>
@@ -111,29 +87,39 @@ export function DashboardHeader({ user, subscription, onSubscriptionUpdate }: Da
                 <div className="py-1" role="menu">
                   <div className="px-4 py-2 text-sm text-gray-700 border-b">
                     Current Plan: <span className="font-semibold capitalize">{subscription?.plan || 'Free'}</span>
+                    {subscription?.cancel_at_period_end && (
+                      <p className="text-xs text-red-500">Cancels at end of period</p>
+                    )}
                   </div>
                   
-                  {(!subscription || subscription?.plan === 'free') && (
+                  {showUpgradeButton && (
                     <button
-                      onClick={handleUpgrade}
-                      disabled={isLoading}
-                      className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => navigate('/pricing')}
+                      className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
                       role="menuitem"
                     >
-                      {isLoading ? 'Processing...' : 'Upgrade to Pro'}
+                      Upgrade to Pro
                     </button>
                   )}
 
-                  {subscription?.plan === 'pro' && (
+                  {isSubscriptionActive && subscription?.plan === 'pro' && (
                     <button
                       onClick={handleCancelSubscription}
                       disabled={isLoading}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
                       role="menuitem"
                     >
                       {isLoading ? 'Processing...' : 'Cancel Subscription'}
                     </button>
                   )}
+
+                  <div className="px-4 py-2 text-xs text-gray-500 border-t">
+                    {subscription?.plan === 'free' ? (
+                      `${subscription.analysis_count || 0}/${MAX_FREE_ANALYSES} analyses used`
+                    ) : (
+                      `${subscription?.analysis_count || 0} analyses used`
+                    )}
+                  </div>
 
                   <button
                     onClick={() => supabase.auth.signOut()}

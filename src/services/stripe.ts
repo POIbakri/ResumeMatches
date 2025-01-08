@@ -17,6 +17,7 @@ if (!stripePublicKey) {
 
 export const stripe = loadStripe(stripePublicKey);
 
+// Get subscription status
 export async function getSubscriptionStatus(userId: string): Promise<SubscriptionStatus> {
   const { data: subscription, error } = await supabase
     .from('subscriptions')
@@ -35,75 +36,6 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
     currentPeriodEnd: subscription.current_period_end,
     cancelAtPeriodEnd: subscription.cancel_at_period_end
   };
-}
-
-// Update subscription details (called from webhook)
-export async function updateSubscriptionStatus(
-  stripeSubscriptionId: string,
-  status: string,
-  currentPeriodStart: string,
-  currentPeriodEnd: string,
-  cancelAtPeriodEnd: boolean
-) {
-  const { error } = await supabase
-    .from('subscriptions')
-    .update({
-      status,
-      current_period_start: currentPeriodStart,
-      current_period_end: currentPeriodEnd,
-      cancel_at_period_end: cancelAtPeriodEnd,
-      updated_at: new Date().toISOString()
-    })
-    .eq('stripe_subscription_id', stripeSubscriptionId);
-
-  if (error) {
-    throw new Error(`Failed to update subscription: ${error.message}`);
-  }
-}
-
-// Create initial subscription record (called from webhook)
-export async function createSubscription(
-  userId: string,
-  stripeCustomerId: string,
-  stripeSubscriptionId: string,
-  plan: string,
-  currentPeriodStart: string,
-  currentPeriodEnd: string
-) {
-  console.log('Creating subscription with data:', {
-    userId,
-    stripeCustomerId,
-    stripeSubscriptionId,
-    plan,
-    currentPeriodStart,
-    currentPeriodEnd
-  });
-
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .insert({
-      user_id: userId,
-      stripe_customer_id: stripeCustomerId,
-      stripe_subscription_id: stripeSubscriptionId,
-      plan,
-      status: 'active',
-      current_period_start: currentPeriodStart,
-      current_period_end: currentPeriodEnd,
-      cancel_at_period_end: false,
-      analysis_count: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Failed to create subscription:', error);
-    throw new Error(`Failed to create subscription: ${error.message}`);
-  }
-
-  console.log('Subscription created:', data);
-  return data;
 }
 
 // Increment analysis count for a user

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRightIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
 export function HeroSection() {
   return (
@@ -37,7 +37,7 @@ export function HeroSection() {
               </p>
 
               {/* CTA buttons with enhanced design */}
-              <div className="mt-6 xs:mt-8 flex flex-col xs:flex-row items-stretch xs:items-center gap-3 xs:gap-4 sm:gap-6">
+              <div className="mt-6 xs:mt-8">
                 <Link
                   to="/signup"
                   className="group relative inline-flex items-center justify-center px-4 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-4 text-sm xs:text-base sm:text-lg font-semibold text-blue-900 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
@@ -46,14 +46,6 @@ export function HeroSection() {
                   <ArrowRightIcon className="ml-2 h-4 xs:h-5 w-4 xs:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </Link>
-                
-                <a
-                  href="#demo"
-                  className="group inline-flex items-center justify-center px-4 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-4 text-sm xs:text-base sm:text-lg font-semibold text-white border-2 border-white/20 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-all duration-200"
-                >
-                  <PlayCircleIcon className="mr-2 h-4 xs:h-5 sm:h-6 w-4 xs:w-5 sm:w-6" />
-                  Watch Demo
-                </a>
               </div>
             </div>
 

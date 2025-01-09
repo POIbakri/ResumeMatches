@@ -1,6 +1,6 @@
 import { User } from '@supabase/supabase-js';
 import { UserCircleIcon, BellIcon } from '@heroicons/react/24/outline';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useSubscription } from '../../hooks/useSubscription';
@@ -11,7 +11,7 @@ export function DashboardHeader({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { subscription, refetchSubscription } = useSubscription();
+  const { subscription } = useSubscription();
 
   const handleCancelSubscription = async () => {
     try {
@@ -22,14 +22,13 @@ export function DashboardHeader({ user }: { user: User | null }) {
         .from('subscriptions')
         .update({
           status: 'canceled',
-          cancel_at_period_end: true,
-          current_period_end: new Date().toISOString() // or keep existing end date
+          cancelAtPeriodEnd: true,
+          currentPeriodEnd: new Date().toISOString()
         })
         .eq('user_id', user?.id);
 
       if (error) throw error;
       
-      await refetchSubscription();
       navigate('/pricing');
     } catch (error) {
       console.error('Error cancelling subscription:', error);
@@ -40,8 +39,8 @@ export function DashboardHeader({ user }: { user: User | null }) {
   };
 
   const isSubscriptionActive = subscription?.status === 'active';
-  const hasReachedLimit = (subscription?.analysis_count ?? 0) >= MAX_FREE_ANALYSES;
-  const showUpgradeButton = !isSubscriptionActive || hasReachedLimit;
+  const hasReachedLimit = (subscription?.analysisCount ?? 0) >= MAX_FREE_ANALYSES;
+  const showUpgradeButton = !isSubscriptionActive || hasReachedLimit || subscription?.plan === 'free';
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-8">
@@ -87,7 +86,7 @@ export function DashboardHeader({ user }: { user: User | null }) {
                 <div className="py-1" role="menu">
                   <div className="px-4 py-2 text-sm text-gray-700 border-b">
                     Current Plan: <span className="font-semibold capitalize">{subscription?.plan || 'Free'}</span>
-                    {subscription?.cancel_at_period_end && (
+                    {subscription?.cancelAtPeriodEnd && (
                       <p className="text-xs text-red-500">Cancels at end of period</p>
                     )}
                   </div>
@@ -115,9 +114,9 @@ export function DashboardHeader({ user }: { user: User | null }) {
 
                   <div className="px-4 py-2 text-xs text-gray-500 border-t">
                     {subscription?.plan === 'free' ? (
-                      `${subscription.analysis_count || 0}/${MAX_FREE_ANALYSES} analyses used`
+                      `${subscription.analysisCount || 0}/${MAX_FREE_ANALYSES} analyses used`
                     ) : (
-                      `${subscription?.analysis_count || 0} analyses used`
+                      `${subscription?.analysisCount || 0} analyses used`
                     )}
                   </div>
 
